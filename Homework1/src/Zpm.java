@@ -50,10 +50,6 @@ public class Zpm {
                 // ChatGPT came up with the regex which allows for strings with spaces to be put into one index (ex: "Hello World")
                 String[] lineArray = line.split("\\s(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
                 lines.add(lineArray);
-                // remove quotes from the line
-                for (int i = 0; i < lineArray.length; i++) {
-                    lineArray[i] = lineArray[i].replaceAll("\"", "");
-                }
             }
             scanner.close();
             System.out.println("[+] INFO: File reading complete.");
@@ -85,14 +81,14 @@ public class Zpm {
                         System.exit(1);
                     }
                     // check and see if the var is letters and the value is either number or letters
-                    if (line[0].matches("[a-zA-Z]+") && line[2].matches("^[a-zA-Z0-9\s]*$")) {
+                    if (line[0].matches("[a-zA-Z]+") && line[2].matches("^[a-zA-Z0-9\\s\"]*$")) {
                         // check to see = is there
                         if (line[1].equals("=")) {
                             // if it's an int
                             if (line[2].matches("^[0-9]*$"))
                                 hashMap.put(line[0], Integer.parseInt(line[2]));
                             else {
-                                hashMap.put(line[0], line[2]);
+                                hashMap.put(line[0], line[2].replaceAll("\"", ""));
                             }
                         }
 
@@ -113,35 +109,46 @@ public class Zpm {
                             }
                         }
 
-                        if (line[1].equals("+=")) {
-                            if (line[2].matches("^[0-9]*$") && hashMap.get(line[0]).toString().matches("^[0-9]*$")) {
-                                Integer old = (Integer) hashMap.get(line[0]);
-                                if (old != null) {
-                                    hashMap.put(line[0], old + Integer.parseInt(line[2]));
+                        if (line[1].equals("+=") && hashMap.get(line[0]) != null) {
+                            // A(12) += 10
+                            // A(12) += "letter" --> error
+                            // A(hello) += A
+                            // A(hello) += 12 --> error
+                            // A(hello) += hello123
+                            String oldValue = hashMap.get(line[0]).toString();
+                            if (oldValue.matches("^[0-9]*$")) {
+                                // oldValue is a int check to see if new val is an int
+                                if (line[2].matches("^[0-9]*$")) {
+                                    hashMap.put(line[0], (Integer.parseInt(oldValue) + Integer.parseInt(line[2])));
+                                } else if (line[2].matches("^[^\"]*$") ) {
+                                    // does not have a quote so search for variable and make sure its a number
+                                    if (hashMap.get(line[2]) != null && hashMap.get(line[2]).toString().matches("^[0-9]*$")) {
+                                        //  add vars
+                                        String val = hashMap.get(line[2]).toString();
+                                        int parseInt = Integer.parseInt(val);
+                                        hashMap.put(line[0], (Integer.parseInt(oldValue) + parseInt));
+                                    } else {
+                                        // var not found
+                                        System.out.println("RUNTIME ERROR: line " + (i + 1));
+                                        System.exit(1);
+                                    }
                                 } else {
+                                    // does have a quote so end
                                     System.out.println("RUNTIME ERROR: line " + (i + 1));
                                     System.exit(1);
                                 }
-                            } else if (line[2].matches(".*[a-zA-Z].*")) {
-                                String old = hashMap.get(line[0]).toString();
-                                if (hashMap.get(line[2]) == null) {
-                                    if (old != null) {
-                                        hashMap.put(line[0], old + line[2]);
-                                    } else {
-                                        System.out.println("RUNTIME ERROR: line " + (i + 1));
-                                        System.exit(1);
-                                    }
-                                } else {
-                                   if (old != null) {
-                                        hashMap.put(line[0], (Integer.parseInt(old) + (int)hashMap.get(line[2])));
-                                    } else {
-                                        System.out.println("RUNTIME ERROR: line " + (i + 1));
-                                        System.exit(1);
-                                    }
-                                }
-                            } else {
+                            } else if (line[2].matches("^\".*?\"$")) {
+                                // oldValue has a letter and quotes so add strings
+                                String newValue = line[2].replaceAll("\"", "");
+                                hashMap.put(line[0], hashMap.get(line[0]) + newValue);
+                            } else if (line[2].matches("^[0-9]*$")) {
+                                // adding an int to string so error
                                 System.out.println("RUNTIME ERROR: line " + (i + 1));
                                 System.exit(1);
+                            } else {
+                                // oldValue has a letter and check for a value
+                                if(hashMap.get(line[2]) != null) {
+                                    hashMap.put(line[0], hashMap.get(line[0]).toString() + hashMap.get(line[2]).toString());                                }
                             }
                         }
 
