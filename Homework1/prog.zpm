@@ -1,8 +1,5 @@
-A = 10 ;
-A += A ;
+A = "hey" ;
+B = 0 ;
+FOR 10 A += "hey" ; ENDFOR
 PRINT A ;
-A = "hello" ;
-A += A ;
-PRINT A ;
-A += 123 ;
-PRINT A ;
+PRINT B ;

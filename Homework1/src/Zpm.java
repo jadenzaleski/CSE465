@@ -1,13 +1,15 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.file.*;
-import java.nio.file.spi.FileTypeDetector;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
+// ChatGPT helped with the regex's
 public class Zpm {
+    // all the commands
     static ArrayList<String[]> lines = new ArrayList<>();
+    // all the variables
     static HashMap<String, Object> hashMap = new HashMap<>();
 
     public static void main(String[] args) {
@@ -29,7 +31,7 @@ public class Zpm {
             } else {
                 System.out.println("[+] INFO: " + arg + " is found!");
                 readFile(arg);
-                parseFile();
+                parseCommands();
 
             }
         }
@@ -49,7 +51,27 @@ public class Zpm {
                 // split up the line into an array of strings
                 // ChatGPT came up with the regex which allows for strings with spaces to be put into one index (ex: "Hello World")
                 String[] lineArray = line.split("\\s(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
-                lines.add(lineArray);
+                // lineArray could contain multiple commands so split those into individual lines
+                ArrayList<String> command = new ArrayList<>();
+                for (int i = 0; i < lineArray.length; i++) {
+                    if (lineArray[i].equals(";")) {
+                        command.add(lineArray[i]);
+                        lines.add(command.toArray(new String[0]));
+                        command.clear();
+                    } else if (lineArray[i].equals("FOR") && i + 1 < lineArray.length) {
+                        command.add(lineArray[i]);
+                        command.add(lineArray[i + 1]);
+                        lines.add(command.toArray(new String[0]));
+                        command.clear();
+                        i++;
+                    } else if (lineArray[i].equals("ENDFOR")) {
+                        command.add(lineArray[i]);
+                        lines.add(command.toArray(new String[0]));
+                        command.clear();
+                    } else {
+                        command.add(lineArray[i]);
+                    }
+                }
             }
             scanner.close();
             System.out.println("[+] INFO: File reading complete.");
@@ -59,9 +81,22 @@ public class Zpm {
         }
     }
 
-    private static void parseFile() {
+    // error handler
+    private static void error(String[] line) {
+        StringBuilder str = new StringBuilder();
+        for (String s : line) {
+            str.append(s).append(" ");
+        }
+        System.out.println("[+] ERROR: command \"" + str + "\"");
+        System.exit(1);
+    }
+
+    private static void parseCommands() {
+        ArrayList<String[]> forCommands = new ArrayList<>();
+        int f = 0;
         for (int i = 0; i < lines.size(); i++) {
             String[] line = lines.get(i);
+            // a case for each type of action: PARSE, FOR, ENDFOR, and all var operators
             switch (line[0]) {
                 case "PRINT":
                     if (line[1].matches("[a-zA-Z]+") && hashMap.get(line[1]) != null) {
@@ -69,16 +104,29 @@ public class Zpm {
                     }
                     break;
                 case "FOR":
+                    if (line[1].matches("^[0-9]*$")) {
+                        int k = i + 1;
+                        String[] fline = lines.get(k);
+                        while (!fline[0].equals("ENDFOR")) {
+                            forCommands.add(lines.get(k));
+                            k++;
+                            fline = lines.get(k);
+                        }
+                        f = Integer.parseInt(line[1]) - 1;
+                    } else {
+                        error(line);
+                    }
                     break;
                 case "ENDFOR":
-                    // error
+                    for (int j = 0; j < f; j++) {
+                        lines.addAll(i + 1, forCommands);
+                    }
                     break;
 
                 default:
                     // now we have 4 cases, var, operator, and value: A = 12 ;
                     if (line.length < 3 && line[line.length - 1].equals(";")) {
-                        System.out.println("RUNTIME ERROR: line " + (i + 1));
-                        System.exit(1);
+                        error(line);
                     }
                     // check and see if the var is letters and the value is either number or letters
                     if (line[0].matches("[a-zA-Z]+") && line[2].matches("^[a-zA-Z0-9\\s\"]*$")) {
@@ -88,6 +136,7 @@ public class Zpm {
                             if (line[2].matches("^[0-9]*$"))
                                 hashMap.put(line[0], Integer.parseInt(line[2]));
                             else {
+                                // remove the "
                                 hashMap.put(line[0], line[2].replaceAll("\"", ""));
                             }
                         }
@@ -100,27 +149,20 @@ public class Zpm {
                                 if (old != null) {
                                     hashMap.put(line[0], old * Integer.parseInt(line[2]));
                                 } else {
-                                    System.out.println("RUNTIME ERROR: line " + (i + 1));
-                                    System.exit(1);
+                                    error(line);
                                 }
                             } else {
-                                System.out.println("RUNTIME ERROR: line " + (i + 1));
-                                System.exit(1);
+                                error(line);
                             }
                         }
 
                         if (line[1].equals("+=") && hashMap.get(line[0]) != null) {
-                            // A(12) += 10
-                            // A(12) += "letter" --> error
-                            // A(hello) += A
-                            // A(hello) += 12 --> error
-                            // A(hello) += hello123
                             String oldValue = hashMap.get(line[0]).toString();
                             if (oldValue.matches("^[0-9]*$")) {
                                 // oldValue is a int check to see if new val is an int
                                 if (line[2].matches("^[0-9]*$")) {
                                     hashMap.put(line[0], (Integer.parseInt(oldValue) + Integer.parseInt(line[2])));
-                                } else if (line[2].matches("^[^\"]*$") ) {
+                                } else if (line[2].matches("^[^\"]*$")) {
                                     // does not have a quote so search for variable and make sure its a number
                                     if (hashMap.get(line[2]) != null && hashMap.get(line[2]).toString().matches("^[0-9]*$")) {
                                         //  add vars
@@ -129,13 +171,11 @@ public class Zpm {
                                         hashMap.put(line[0], (Integer.parseInt(oldValue) + parseInt));
                                     } else {
                                         // var not found
-                                        System.out.println("RUNTIME ERROR: line " + (i + 1));
-                                        System.exit(1);
+                                        error(line);
                                     }
                                 } else {
                                     // does have a quote so end
-                                    System.out.println("RUNTIME ERROR: line " + (i + 1));
-                                    System.exit(1);
+                                    error(line);
                                 }
                             } else if (line[2].matches("^\".*?\"$")) {
                                 // oldValue has a letter and quotes so add strings
@@ -143,12 +183,12 @@ public class Zpm {
                                 hashMap.put(line[0], hashMap.get(line[0]) + newValue);
                             } else if (line[2].matches("^[0-9]*$")) {
                                 // adding an int to string so error
-                                System.out.println("RUNTIME ERROR: line " + (i + 1));
-                                System.exit(1);
+                                error(line);
                             } else {
                                 // oldValue has a letter and check for a value
-                                if(hashMap.get(line[2]) != null) {
-                                    hashMap.put(line[0], hashMap.get(line[0]).toString() + hashMap.get(line[2]).toString());                                }
+                                if (hashMap.get(line[2]) != null) {
+                                    hashMap.put(line[0], hashMap.get(line[0]).toString() + hashMap.get(line[2]).toString());
+                                }
                             }
                         }
 
@@ -158,14 +198,11 @@ public class Zpm {
                                 if (old != null) {
                                     hashMap.put(line[0], old - Integer.parseInt(line[2]));
                                 } else {
-                                    System.out.println("RUNTIME ERROR: line " + (i + 1));
-                                    System.exit(1);
+                                    error(line);
                                 }
                             } else {
-                                System.out.println("RUNTIME ERROR: line " + (i + 1));
-                                System.exit(1);
+                                error(line);
                             }
-
                         }
                     }
             }
