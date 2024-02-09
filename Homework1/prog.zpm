@@ -1,5 +1,5 @@
-A = "hey" ;
+A = 1 ;
 B = 0 ;
-FOR 10 A += "hey" ; ENDFOR
+FOR 5 B += A ; A *= 2 ; ENDFOR A += 1000 ;
 PRINT A ;
 PRINT B ;
