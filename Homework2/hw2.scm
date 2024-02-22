@@ -30,7 +30,8 @@
             '()
             (if (< (car lst) 0)
                 (cons (car lst) (negatives (cdr lst)))
-                (negatives (cdr lst))
+                (negatives (cdr lst)) ; recursivly call the function to go through the
+                                      ; list and remove negitives
             )
   )
 )
@@ -52,7 +53,8 @@
           ((or (null? lst1) (null? lst2)) #f) ; one is null
           ((and (list? (car lst1)) (list? (car lst2))) ; each element is the same
            (and (struct (car lst1) (car lst2))
-           (struct (cdr lst1) (cdr lst2)))) ; call the rest of the list
+           (struct (cdr lst1) (cdr lst2))) ; call the rest of the list
+          ) 
           (else #t))) ; all pass
 
 
@@ -67,7 +69,7 @@
 ; in the list and the second is the largest in the list. 
 ; lst -- contains numeric values, and length is >= 1.
 (define (minAndMax lst)
-  (list (apply min lst) (apply max lst))
+  (list (apply min lst) (apply max lst)) ; get min and max and put in a list
 )
 
 (line "minAndMax")
@@ -85,8 +87,8 @@
      '()
     )
     ((not (pair? lst)) (list lst))
-    (else (append (flatten (car lst))
-                  (flatten (cdr lst))
+    (else (append (flatten (car lst)) ; recursively flatten the first element
+                  (flatten (cdr lst)) ; and the rest of the list
           )
     )
   )
@@ -137,12 +139,34 @@
 (mydisplay (getLatLon 45056 zipcodes))
 (line "getLatLon")
 ; ---------------------------------------------
-
+; remove duplicates from a list
+(define (removeDuplicates lst)
+  (if (null? lst)
+      '() ; if its null return empty list
+      (cons ; else put element on head of list
+       (car lst)
+       (removeDuplicates (filter (lambda (val) (not (equal? val (car lst)))) (cdr lst)))
+      )
+  )
+)
+; find the intersection of two lists
+(define (commonElements lst1 lst2)
+  (filter (lambda (val) (member val lst2)) lst1)
+)
 ; Returns a list of all the place names common to two states.
 ; placeName -- is the text corresponding to the name of the place
 ; zips -- the zipcode DB
 (define (getCommonPlaces state1 state2 zips)
-	(list state1 state2)
+  (let* (
+         ; filter out entries from the zipcode DB and state1
+         (list1 (filter (lambda (entry) (equal? (caddr entry) state1)) zips))
+         ; filter out entries from the zipcode DB and state2
+         (list2 (filter (lambda (entry) (equal? (caddr entry) state2)) zips))
+         ; get the intersection of place names from state1 and state2 and also remove duplicates
+         (commonPlaces (removeDuplicates (commonElements (map cadr list1) (map cadr list2))))
+        )
+    commonPlaces
+  )
 )
 
 (line "getCommonPlaces")
@@ -169,7 +193,12 @@
 ; state -- state
 ; zips -- zipcode DB
 (define (zipCount state zips)
-	0
+  (length
+   (filter ; filter out all the entries where the state is not equal to the desired state
+    (lambda (entry) (equal? (caddr entry) state))
+    zips ; now get the length of the list
+   )
+  )
 )
 
 (line "zipCount")
