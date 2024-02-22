@@ -233,8 +233,21 @@
 ; lst -- flat list of items
 ; filters -- list of predicates to apply to the individual elements
 
+(define (all? condition filters)
+  (if (null? filters) ; if no filters its good
+      #t
+      (and (condition (car filters)) ; check if the condition holds for the first element
+           (all? condition (cdr filters))) ; check the rest
+  )
+)
+
 (define (filterList lst filters)
-	lst
+  ; check if all conditions in filters hold true for an element
+  (define (allConditions? element)
+    (all? (lambda (condition) (apply condition (list element))) filters) ; apply condition(s)
+  )
+  ; filter the list based on ALL conditions
+  (filter allConditions? lst)
 )
 
 (line "filterList")
