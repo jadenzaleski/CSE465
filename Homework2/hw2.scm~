@@ -26,13 +26,7 @@
 ; ================ Solve the following functions ===================
 ; Return a list with only the negatives items
 (define (negatives lst)
-	(if (null? lst)
-            '()
-            (if (< (car lst) 0)
-                (cons (car lst) (negatives (cdr lst)))
-                (negatives (cdr lst))
-            )
-  )
+	lst
 )
 
 (line "negatives")
@@ -46,15 +40,8 @@
 ; Returns true if the two lists have identical structure
 ; in terms of how many elements and nested lists they have in the same order
 (define (struct lst1 lst2)
-        (cond
-          ((not (= (length lst1) (length lst2))) #f) ; lengths
-          ((and (null? lst1) (null? lst2)) #t) ; both are null                                  
-          ((or (null? lst1) (null? lst2)) #f) ; one is null
-          ((and (list? (car lst1)) (list? (car lst2))) ; each element is the same
-           (and (struct (car lst1) (car lst2))
-           (struct (cdr lst1) (cdr lst2)))) ; call the rest of the list
-          (else #t))) ; all pass
-
+	#t
+)
 
 (line "struct")
 (mydisplay (struct '(a b c (c a b)) '(1 2 3 (a b c))))  ; -> #t
@@ -67,7 +54,7 @@
 ; in the list and the second is the largest in the list. 
 ; lst -- contains numeric values, and length is >= 1.
 (define (minAndMax lst)
-  (list (apply min lst) (apply max lst))
+	'()
 )
 
 (line "minAndMax")
@@ -80,16 +67,7 @@
 ; that are inside nested loops taken out. So we want to flatten all elements and have
 ; them all in a single list. For example '(a (a a) a))) should become (a a a a)
 (define (flatten lst)
-  (cond
-    ((null? lst)
-     '()
-    )
-    ((not (pair? lst)) (list lst))
-    (else (append (flatten (car lst))
-                  (flatten (cdr lst))
-          )
-    )
-  )
+	'()
 )
 
 (line "flatten")
@@ -104,12 +82,8 @@
 ; The inputs '(1 2) and '(a b c) should return a single list:
 ; ((1 a) (1 b) (1 c) (2 a) (2 b) (2 c))
 ; lst1 & lst2 -- two flat lists.
-(define (crossproduct lst1 lst2) ; ChatGPT helped with this function and explaining
-  (if (or (null? lst1) (null? lst2)) ;  what the append-map, map, and lambda
-      '()
-      (append-map (lambda (x) (map (lambda (y) (list x y)) lst2))
-                  lst1)
-  )
+(define (crossproduct lst1 lst2)
+	'()
 )
 
 (line "crossproduct")
@@ -125,12 +99,7 @@
 ; from the 'zipcodes.scm' file for this. You can just call 'zipcodes' directly
 ; as shown in the sample example
 (define (getLatLon zipcode zips)
-  (let ((entry (assoc zipcode zips)))
-    (if entry
-        (cddddr entry) ; get first pair
-        "Zip code not found"
-    )
-  )
+	(list zipcode (car zips))
 )
 
 (line "getLatLon")
