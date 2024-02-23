@@ -48,15 +48,16 @@
 ; in terms of how many elements and nested lists they have in the same order
 (define (struct lst1 lst2)
         (cond
-          ((not (= (length lst1) (length lst2))) #f) ; lengths
+          ((not (= (length lst1) (length lst2))) #f) ; lengths are =
           ((and (null? lst1) (null? lst2)) #t) ; both are null                                  
           ((or (null? lst1) (null? lst2)) #f) ; one is null
           ((and (list? (car lst1)) (list? (car lst2))) ; each element is the same
-           (and (struct (car lst1) (car lst2))
+           (and (struct (car lst1) (car lst2)) ; check the rest of the list to make sure its the same
            (struct (cdr lst1) (cdr lst2))) ; call the rest of the list
           ) 
-          (else #t))) ; all pass
-
+          (else #t) ; all pass
+        )
+)
 
 (line "struct")
 (mydisplay (struct '(a b c (c a b)) '(1 2 3 (a b c))))  ; -> #t
@@ -83,7 +84,7 @@
 ; them all in a single list. For example '(a (a a) a))) should become (a a a a)
 (define (flatten lst)
   (cond
-    ((null? lst)
+    ((null? lst) ; if blank return empty
      '()
     )
     ((not (pair? lst)) (list lst))
@@ -108,9 +109,16 @@
 ; lst1 & lst2 -- two flat lists.
 (define (crossproduct lst1 lst2) ; ChatGPT helped with this function and explaining
   (if (or (null? lst1) (null? lst2)) ;  what the append-map, map, and lambda
-      '()
-      (append-map (lambda (x) (map (lambda (y) (list x y)) lst2))
-                  lst1)
+     '()
+     (append-map                       ; concatenate the results
+      (lambda (x)                      ; for each element x in lst1
+       (map                            ; map a function over each element y in lst2
+        (lambda (y) (list x y))        ; create a pair (x y)
+         lst2
+       )
+      )
+      lst1
+     )
   )
 )
 
@@ -162,7 +170,7 @@
          (list1 (filter (lambda (entry) (equal? (caddr entry) state1)) zips))
          ; filter out entries from the zipcode DB and state2
          (list2 (filter (lambda (entry) (equal? (caddr entry) state2)) zips))
-         ; get the intersection of place names from state1 and state2 and also remove duplicates
+         ; get the common place names from state1 and state2 and also remove duplicates
          (commonPlaces (removeDuplicates (commonElements (map cadr list1) (map cadr list2))))
         )
     commonPlaces
@@ -241,7 +249,7 @@
   )
 )
 
-(define (filterList lst filters)
+(define (filterList lst filters) ; ChatGPT helps with apply and the lambdas
   ; check if all conditions in filters hold true for an element
   (define (allConditions? element)
     (all? (lambda (condition) (apply condition (list element))) filters) ; apply condition(s)
