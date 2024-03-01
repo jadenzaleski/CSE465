@@ -30,6 +30,8 @@ public class Zpm {
                 return;
             } else {
                 System.out.println("[+] INFO: " + arg + " is found!");
+                lines.clear();
+                hashMap.clear();
                 readFile(arg);
                 parseCommands();
 
@@ -129,74 +131,84 @@ public class Zpm {
                         error(line);
                     }
                     // check and see if the var is letters and the value is either number or letters
-                    if (line[0].matches("[a-zA-Z]+") && line[2].matches("^[a-zA-Z0-9\\s\"]*$")) {
+                    if (line[0].matches("[a-zA-Z]+") && line[2].matches("^[a-zA-Z0-9\\\\s\"-]*$")) {
                         // check to see = is there
                         if (line[1].equals("=")) {
                             // if it's an int
-                            if (line[2].matches("^[0-9]*$"))
+                            if (line[2].matches("^-?[0-9]+$"))
                                 hashMap.put(line[0], Integer.parseInt(line[2]));
                             else {
                                 // remove the "
                                 hashMap.put(line[0], line[2].replaceAll("\"", ""));
                             }
                         } else if (line[1].equals("*=")) {
-                                if (line[2].matches("^[0-9]*$") && hashMap.get(line[0]).toString().matches("^[0-9]*$")) {
-                                    // ChatGPT helped with casting
-                                    Integer old = (Integer) hashMap.get(line[0]);
-                                    if (old != null) {
-                                        hashMap.put(line[0], old * Integer.parseInt(line[2]));
-                                    } else {
-                                        error(line);
-                                    }
+                            // if right is a number and left is a value
+                            if (line[2].matches("^-?[0-9]+$") && hashMap.get(line[0]).toString().matches("^-?[0-9]+$")) {
+                                // ChatGPT helped with casting
+                                Integer old = (Integer) hashMap.get(line[0]);
+                                if (old != null) {
+                                    hashMap.put(line[0], old * Integer.parseInt(line[2]));
                                 } else {
                                     error(line);
                                 }
-                            } else if (line[1].equals("+=") && hashMap.get(line[0]) != null) {
-                                String oldValue = hashMap.get(line[0]).toString();
-                                if (oldValue.matches("^[0-9]*$")) {
-                                    // oldValue is a int check to see if new val is an int
-                                    if (line[2].matches("^[0-9]*$")) {
-                                        hashMap.put(line[0], (Integer.parseInt(oldValue) + Integer.parseInt(line[2])));
-                                    } else if (line[2].matches("^[^\"]*$")) {
-                                        // does not have a quote so search for variable and make sure its a number
-                                        if (hashMap.get(line[2]) != null && hashMap.get(line[2]).toString().matches("^[0-9]*$")) {
-                                            //  add vars
-                                            String val = hashMap.get(line[2]).toString();
-                                            int parseInt = Integer.parseInt(val);
-                                            hashMap.put(line[0], (Integer.parseInt(oldValue) + parseInt));
-                                        } else {
-                                            // var not found
-                                            error(line);
-                                        }
-                                    } else {
-                                        // does have a quote so end
-                                        error(line);
-                                    }
-                                } else if (line[2].matches("^\".*?\"$")) {
-                                    // oldValue has a letter and quotes so add strings
-                                    String newValue = line[2].replaceAll("\"", "");
-                                    hashMap.put(line[0], hashMap.get(line[0]) + newValue);
-                                } else if (line[2].matches("^[0-9]*$")) {
-                                    // adding an int to string so error
-                                    error(line);
-                                } else {
-                                    // oldValue has a letter and check for a value
-                                    if (hashMap.get(line[2]) != null) {
-                                        hashMap.put(line[0], hashMap.get(line[0]).toString() + hashMap.get(line[2]).toString());
-                                    }
-                                }
-                            } else if (line[1].equals("-=")) {
-                                if (line[2].matches("^[0-9]*$") && hashMap.get(line[0]).toString().matches("^[0-9]*$")) {
-                                    Integer old = (Integer) hashMap.get(line[0]);
-                                    if (old != null) {
-                                        hashMap.put(line[0], old - Integer.parseInt(line[2]));
-                                    } else {
-                                        error(line);
-                                    }
+                                // if the right is a letter and the left is a value
+                            } else if (line[2].matches("[a-zA-Z]+") && hashMap.get(line[0]).toString().matches("^-?[0-9]+$")) {
+                                Integer old = (Integer) hashMap.get(line[0]);
+                                Integer right = (Integer) hashMap.get(line[2]);
+                                if (old != null && right != null) {
+                                    hashMap.put(line[0], old * right);
                                 } else {
                                     error(line);
                                 }
                             } else {
+                                error(line);
+                            }
+                        } else if (line[1].equals("+=") && hashMap.get(line[0]) != null) {
+                            String oldValue = hashMap.get(line[0]).toString();
+                            if (oldValue.matches("^-?[0-9]+$")) {
+                                // oldValue is a int check to see if new val is an int
+                                if (line[2].matches("^-?[0-9]+$")) {
+                                    hashMap.put(line[0], (Integer.parseInt(oldValue) + Integer.parseInt(line[2])));
+                                } else if (line[2].matches("^[^\"]*$")) {
+                                    // does not have a quote so search for variable and make sure its a number
+                                    if (hashMap.get(line[2]) != null && hashMap.get(line[2]).toString().matches("^-?[0-9]+$")) {
+                                        //  add vars
+                                        String val = hashMap.get(line[2]).toString();
+                                        int parseInt = Integer.parseInt(val);
+                                        hashMap.put(line[0], (Integer.parseInt(oldValue) + parseInt));
+                                    } else {
+                                        // var not found
+                                        error(line);
+                                    }
+                                } else {
+                                    // does have a quote so end
+                                    error(line);
+                                }
+                            } else if (line[2].matches("^\".*?\"$")) {
+                                // oldValue has a letter and quotes so add strings
+                                String newValue = line[2].replaceAll("\"", "");
+                                hashMap.put(line[0], hashMap.get(line[0]) + newValue);
+                            } else if (line[2].matches("^-?[0-9]+$")) {
+                                // adding an int to string so error
+                                error(line);
+                            } else {
+                                // oldValue has a letter and check for a value
+                                if (hashMap.get(line[2]) != null) {
+                                    hashMap.put(line[0], hashMap.get(line[0]).toString() + hashMap.get(line[2]).toString());
+                                }
+                            }
+                        } else if (line[1].equals("-=")) {
+                            if (line[2].matches("^-?[0-9]+$") && hashMap.get(line[0]).toString().matches("^-?[0-9]+$")) {
+                                Integer old = (Integer) hashMap.get(line[0]);
+                                if (old != null) {
+                                    hashMap.put(line[0], old - Integer.parseInt(line[2]));
+                                } else {
+                                    error(line);
+                                }
+                            } else {
+                                error(line);
+                            }
+                        } else {
                             error(line);
                         }
                     }

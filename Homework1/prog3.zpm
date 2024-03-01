@@ -1,0 +1,6 @@
+A = 0 ;
+PRINT A ;
+FOR 2 A += -2 ; ENDFOR
+PRINT A ;
+FOR 2 A += 1 ; A *= 2 ; ENDFOR
+PRINT A ;
