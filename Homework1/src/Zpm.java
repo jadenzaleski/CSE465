@@ -122,6 +122,7 @@ public class Zpm {
                 case "ENDFOR":
                     for (int j = 0; j < f; j++) {
                         lines.addAll(i + 1, forCommands);
+                        forCommands.clear();
                     }
                     break;
 
