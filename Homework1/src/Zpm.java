@@ -1,5 +1,4 @@
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,6 +11,7 @@ public class Zpm {
     // all the variables
     static HashMap<String, Object> hashMap = new HashMap<>();
 
+    static String path = "";
     public static void main(String[] args) {
         if (args.length == 0) {
             System.out.println("[+] ERROR: You must provide a command line argument! (ex: java Zpm prog.zpm).");
@@ -33,6 +33,7 @@ public class Zpm {
                 lines.clear();
                 hashMap.clear();
                 readFile(arg);
+                path = arg;
                 parseCommands();
 
             }
@@ -83,13 +84,33 @@ public class Zpm {
         }
     }
 
+    private static int getLineNum(String str) {
+        int lineNumber = 0;
+
+                try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        lineNumber++;
+                        if (line.contains(str)) {
+                            return lineNumber;
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                // Return -1 if the target string is not found in the file
+        return -1;
+    }
     // error handler
     private static void error(String[] line) {
         StringBuilder str = new StringBuilder();
         for (String s : line) {
             str.append(s).append(" ");
         }
-        System.out.println("[+] ERROR: command \"" + str + "\"");
+        str.deleteCharAt(str.length() - 1);
+        int lineNum = getLineNum(str.toString());
+        System.out.println("[+] ERROR: command \"" + str + "\", line: " + lineNum);
         System.exit(1);
     }
 
