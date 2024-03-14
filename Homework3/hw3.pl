@@ -5,7 +5,7 @@
 % #1 (Undergraduate/Graduate) (5/5 pts)
 % Determine the Maximum of two int numbers
 % maxnums(A, B, MAX).
-
+% AI helped with 'is'
 maxnums(A, B, MAX) :- A >= B, MAX is A.
 maxnums(A, B, MAX) :- B > A, MAX is B.
 
@@ -31,6 +31,8 @@ sum([H|T], SUM) :- sum(T, NewSum), SUM is H + NewSum.
 % ** You can always assume that the given LST is not empty. 
 % max(LST, MAX).
 
+max([A], A).
+max([H|T], MAX) :- max(T, NewMax), maxnums(H, NewMax, MAX).
 
 % max([-5, -5, -5], MAX). -> MAX = -5
 % max([1], MAX). -> MAX = 1
@@ -43,8 +45,17 @@ sum([H|T], SUM) :- sum(T, NewSum), SUM is H + NewSum.
 %    as part of your solution.
 % ** You can always assume that the given LST is not empty. 
 % partitionable(LST).
+% AI helped with the logic flow
+% make sure the list is even then split it
+partitionable(LST) :- sum(LST, Total), Total mod 2 =:= 0, Half is Total // 2, canPartition(LST, Half).
 
- 
+canPartition(LST, Target) :- subsetSum(LST, Target, _).
+% see if each subset is equal to the other
+subsetSum([], 0, []).
+subsetSum([H|T], Target, [H|Subset]) :- Target >= H, NewTarget is Target - H, subsetSum(T, NewTarget, Subset).
+subsetSum([_|T], Target, Subset) :- subsetSum(T, Target, Subset).
+
+
 % partitionable([1, 2, 3, 4, 10]). -> true. because [10, 10]
 % partitionable([2, 1, 1]). -> true. because [2, 2]
 % partitionable([0]). -> true.
