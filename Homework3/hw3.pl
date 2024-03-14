@@ -77,7 +77,10 @@ elementExist(E, [_|T]) :- elementExist(E, T).
 % #6 (Undergraduate/Graduate) (5/5 pts)
 % Determine the reverse list of integer numbers
 % reverse(LST, REVLST).
-
+% if empty return empty
+reverse([], []).
+% AI helped with append
+reverse([H|T], REVLST) :- reverse(T, RevT), append(RevT, [H], REVLST).
 
 % reverse([], REVLST). -> REVLST = []
 % reverse([1, 1, 1], REVLST). -> REVLST = [1, 1, 1]
@@ -88,6 +91,9 @@ elementExist(E, [_|T]) :- elementExist(E, T).
 % Determine the list of integer numbers that are only one digit numbers
 % collectOneDigits(LST, NEWLST). 
 
+collectOneDigits([], []).
+collectOneDigits([H|T], [H|NewT]) :- abs(H) < 10, collectOneDigits(T, NewT).
+collectOneDigits([_|T], NewT) :- collectOneDigits(T, NewT).
 
 % collectOneDigits([10, 90, -20], NEWLST). -> NEWLST = []
 % collectOneDigits([], NEWLST). -> NEWLST = []
