@@ -1,11 +1,14 @@
 % hw3.pl
 % Jaden Zaleski
+% Various AI models helped with coding throughout the 9 questions.
+:- [zipcodes].
 
 % ------------------------------------------------
 % #1 (Undergraduate/Graduate) (5/5 pts)
 % Determine the Maximum of two int numbers
 % maxnums(A, B, MAX).
 % AI helped with 'is'
+
 maxnums(A, B, MAX) :- A >= B, MAX is A.
 maxnums(A, B, MAX) :- B > A, MAX is B.
 
@@ -46,6 +49,7 @@ max([H|T], MAX) :- max(T, NewMax), maxnums(H, NewMax, MAX).
 % ** You can always assume that the given LST is not empty. 
 % partitionable(LST).
 % AI helped with the logic flow
+
 % make sure the list is even then split it
 partitionable(LST) :- sum(LST, Total), Total mod 2 =:= 0, Half is Total // 2, canPartition(LST, Half).
 
@@ -54,7 +58,6 @@ canPartition(LST, Target) :- subsetSum(LST, Target, _).
 subsetSum([], 0, []).
 subsetSum([H|T], Target, [H|Subset]) :- Target >= H, NewTarget is Target - H, subsetSum(T, NewTarget, Subset).
 subsetSum([_|T], Target, Subset) :- subsetSum(T, Target, Subset).
-
 
 % partitionable([1, 2, 3, 4, 10]). -> true. because [10, 10]
 % partitionable([2, 1, 1]). -> true. because [2, 2]
@@ -67,6 +70,7 @@ subsetSum([_|T], Target, Subset) :- subsetSum(T, Target, Subset).
 % list of integer numbers
 % elementExist(E, LST).
 % in class:
+
 elementExist(E, [H|_]) :- E = H,!.
 elementExist(E, [_|T]) :- elementExist(E, T).
 
@@ -80,6 +84,7 @@ elementExist(E, [_|T]) :- elementExist(E, T).
 % if empty return empty
 reverse([], []).
 % AI helped with append
+
 reverse([H|T], REVLST) :- reverse(T, RevT), append(RevT, [H], REVLST).
 
 % reverse([], REVLST). -> REVLST = []
@@ -108,6 +113,7 @@ collectOneDigits([_|T], NewT) :- collectOneDigits(T, NewT).
 % Determine all places based on given state and zipcode.
 % getStateInfo(PLACE, STATE< ZIPCODE).
 
+getStateInfo(Place, State, Zipcode) :- location(Zipcode, Place, State, _, _, _).
 
 % getStateInfo('Oxford', State, 45056). -> State = 'OH'
 % getStateInfo('Oxford', State, _). -> 
@@ -134,7 +140,7 @@ collectOneDigits([_|T], NewT) :- collectOneDigits(T, NewT).
 % State = 'PA' 
 % State = 'WI'
 % 
-% getStateInfo(_, 'OH', 48122) -> false.
+% getStateInfo(_, 'OH', 48122). -> false.
 % ------------------------------------------------
 % #9 (Undergrad/Grad) (15/5 pts)
 % Consult the 'zipcodes.pl' file, and study it.
@@ -152,8 +158,17 @@ collectOneDigits([_|T], NewT) :- collectOneDigits(T, NewT).
 %    about a new programming language on your own is a skil that takes
 %    practice. 
 % getCommon(STATE1, STATE2, PLACELST).
+% AI helped with this:
 
-
+% getCommon(STATE1, STATE2, PLACELST).
+getCommon(State1, State2, PlaceList) :-
+    findall(Place, (location(_, Place, State1, _, _, _),location(_, Place, State2, _, _, _)), Places),
+    sort(Places, PlaceList).
+    
+% double check the count with this:
+% getCommonCount(STATE1, STATE2, COUNT).
+getCommonCount(State1, State2, Count) :- getCommon(State1, State2, PlaceList), length(PlaceList, Count).
+  
 % getCommon('OH','MI',PLACELST). -> *Should be 131 unique plcase* 
 % ['Manchester','Unionville','Athens','Saint
 % Johns','Belmont','Bellaire','Bridgeport','Lansing','Flushing','D
