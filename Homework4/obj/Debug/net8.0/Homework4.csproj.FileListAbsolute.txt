@@ -1,0 +1,15 @@
+/Users/jaden/Desktop/Spring2024/CSE465/CSE465_565/Homework4/bin/Debug/net8.0/Homework4
+/Users/jaden/Desktop/Spring2024/CSE465/CSE465_565/Homework4/bin/Debug/net8.0/Homework4.deps.json
+/Users/jaden/Desktop/Spring2024/CSE465/CSE465_565/Homework4/bin/Debug/net8.0/Homework4.runtimeconfig.json
+/Users/jaden/Desktop/Spring2024/CSE465/CSE465_565/Homework4/bin/Debug/net8.0/Homework4.dll
+/Users/jaden/Desktop/Spring2024/CSE465/CSE465_565/Homework4/bin/Debug/net8.0/Homework4.pdb
+/Users/jaden/Desktop/Spring2024/CSE465/CSE465_565/Homework4/obj/Debug/net8.0/Homework4.GeneratedMSBuildEditorConfig.editorconfig
+/Users/jaden/Desktop/Spring2024/CSE465/CSE465_565/Homework4/obj/Debug/net8.0/Homework4.AssemblyInfoInputs.cache
+/Users/jaden/Desktop/Spring2024/CSE465/CSE465_565/Homework4/obj/Debug/net8.0/Homework4.AssemblyInfo.cs
+/Users/jaden/Desktop/Spring2024/CSE465/CSE465_565/Homework4/obj/Debug/net8.0/Homework4.csproj.CoreCompileInputs.cache
+/Users/jaden/Desktop/Spring2024/CSE465/CSE465_565/Homework4/obj/Debug/net8.0/Homework4.sourcelink.json
+/Users/jaden/Desktop/Spring2024/CSE465/CSE465_565/Homework4/obj/Debug/net8.0/Homework4.dll
+/Users/jaden/Desktop/Spring2024/CSE465/CSE465_565/Homework4/obj/Debug/net8.0/refint/Homework4.dll
+/Users/jaden/Desktop/Spring2024/CSE465/CSE465_565/Homework4/obj/Debug/net8.0/Homework4.pdb
+/Users/jaden/Desktop/Spring2024/CSE465/CSE465_565/Homework4/obj/Debug/net8.0/Homework4.genruntimeconfig.cache
+/Users/jaden/Desktop/Spring2024/CSE465/CSE465_565/Homework4/obj/Debug/net8.0/ref/Homework4.dll
