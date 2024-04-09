@@ -34,9 +34,9 @@
 
 
             Console.WriteLine("Displaying the first 10 records:");
-            for (int i = 0; i < Math.Min(10, zips.Count); i++)
+            for (var i = 0; i < Math.Min(10, zips.Count); i++)
             {
-                Console.WriteLine($"Record {i + 1}:");
+                Console.WriteLine($"Record {zips[i].RecordNumber}:");
                 Console.WriteLine($"Zipcode: {zips[i].Zipcode}");
                 Console.WriteLine($"City: {zips[i].City}");
                 Console.WriteLine($"State: {zips[i].State}");
