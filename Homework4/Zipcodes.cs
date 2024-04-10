@@ -24,9 +24,18 @@ public class ZipCodeRecord
     public string? Notes { get; set; }
 }
 
-public static class ZipCodeDataImporter
+public class DataReader
 {
-    public static List<ZipCodeRecord> ImportData(string filePath)
+    private List<ZipCodeRecord> _records;
+    private readonly string _outputFile;
+
+    protected DataReader(string zipcodePath, string outputFile)
+    {
+        _records = ImportData(zipcodePath);
+        _outputFile = outputFile;
+    }
+
+    private static List<ZipCodeRecord> ImportData(string filePath)
     {
         var records = new List<ZipCodeRecord>();
 
@@ -64,7 +73,70 @@ public static class ZipCodeDataImporter
                 records.Add(record);
             }
         }
-
+        Console.WriteLine("[+] Imported " + records.Count + " records.");
         return records;
+    }
+
+    // Accessor methods for protected fields
+    protected List<ZipCodeRecord> GetRecords()
+    {
+        return _records;
+    }
+
+    protected string GetOutputFile()
+    {
+        return _outputFile;
+    }
+}
+
+public class Part1 : DataReader
+{
+    private readonly string _statesPath;
+
+    private List<string> states;
+    // Constructor
+    private Part1(string zipcodePath, string outputFile, string statesPath) : base(zipcodePath, outputFile)
+    {
+        _statesPath = statesPath;
+        states = GenerateStatesList(statesPath);
+
+    }
+
+    // Factory method
+    public new static Part1 CreateInstance(string zipcodePath, string outputFile, string statesPath)
+    {
+        return new Part1(zipcodePath, outputFile, statesPath);
+    }
+
+    private List<string> GenerateStatesList(string statesPath)
+    {
+        List<string> result = new List<string>();
+        using (StreamReader reader = new StreamReader(statesPath))
+        {
+            while (reader.ReadLine() is { } line)
+            {
+                line = line.ToUpper().Replace(" ", "");
+                result.Add(line);
+            }
+        }
+
+        Console.WriteLine("[+] Part1: Imported " + result.Count + " states.");
+        return result;
+    }
+
+    public void GenerateOutput()
+    {
+        List<string> cities = new List<string>();
+        var r = GetRecords();
+        // get all the cities that match the requirement
+        foreach (var state in states)
+        {
+
+
+        }
+
+        Console.WriteLine("[+] Part1: Generating output to " + GetOutputFile() + " for part 1.");
+
+
     }
 }
