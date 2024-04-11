@@ -1,29 +1,35 @@
+using global::System;
+using global::System.Collections.Generic;
+using global::System.IO;
+using global::System.Linq;
+
+
 namespace Homework4
 {
 
     // Object for each record in the file
     public class ZipCodeRecord
     {
-        public int RecordNumber { get; set; }
-        public string Zipcode { get; set; }
-        public string ZipCodeType { get; set; }
-        public string City { get; set; }
-        public string State { get; set; }
-        public string LocationType { get; set; }
-        public double? Lat { get; set; }
-        public double? Lon { get; set; }
-        public double XAxis { get; set; }
-        public double Yaxis { get; set; }
-        public double ZAxis { get; set; }
-        public string WorldRegion { get; set; }
-        public string Country { get; set; }
-        public string LocationText { get; set; }
-        public string Location { get; set; }
-        public bool Decommissioned { get; set; }
-        public int? TaxReturnsFiled { get; set; }
-        public int? EstimatedPopulation { get; set; }
-        public int? TotalWages { get; set; }
-        public string? Notes { get; set; }
+        public int RecordNumber;
+        public string Zipcode;
+        public string ZipCodeType;
+        public string City;
+        public string State;
+        public string LocationType;
+        public double? Lat;
+        public double? Lon;
+        public double XAxis;
+        public double Yaxis;
+        public double ZAxis;
+        public string WorldRegion;
+        public string Country;
+        public string LocationText;
+        public string Location;
+        // public bool Decommissioned;
+        // public int? TaxReturnsFiled;
+        // public int? EstimatedPopulation;
+        // public int? TotalWages;
+        // public string? Notes;
 
         // AI helped with these overrides
         public static bool operator ==(ZipCodeRecord a, ZipCodeRecord b)
@@ -33,7 +39,7 @@ namespace Homework4
                 return true;
 
             // If one is null, but not both, return false
-            if (a is null || b is null)
+            if (a == null || b == null)
                 return false;
 
             // Return true if the zip codes are equal, false otherwise
@@ -45,12 +51,12 @@ namespace Homework4
             return !(a == b);
         }
 
-        public override bool Equals(object? obj)
+        public override bool Equals(object obj)
         {
-            if (obj is not ZipCodeRecord record)
+            if (obj == null || !(obj is ZipCodeRecord))
                 return false;
 
-            return this == record;
+            return this == (ZipCodeRecord)obj;
         }
 
         public override int GetHashCode()
@@ -79,7 +85,8 @@ namespace Homework4
             {
                 // remove the first one
                 reader.ReadLine();
-                while (reader.ReadLine() is { } line)
+                string line;
+                while ((line = reader.ReadLine()) != null)
                 {
                     var parts = line.Split('\t');
                     var record = new ZipCodeRecord();
@@ -100,11 +107,11 @@ namespace Homework4
                     record.Country = parts[12];
                     record.LocationText = parts[13];
                     record.Location = parts[14];
-                    record.Decommissioned = parts[15] == "TRUE";
-                    record.TaxReturnsFiled = parts.Length > 16 && parts[16] != "" ? int.Parse(parts[16]) : null;
-                    record.EstimatedPopulation = parts.Length > 17 && parts[17] != "" ? int.Parse(parts[17]) : null;
-                    record.TotalWages = parts.Length > 18 && parts[18] != "" ? int.Parse(parts[18]) : null;
-                    record.Notes = parts.Length > 19 ? parts[19] : null;
+                    // record.Decommissioned = parts[15] == "TRUE";
+                    // record.TaxReturnsFiled = parts.Length > 16 && parts[16] != "" ? int.Parse(parts[16]) : null;
+                    // record.EstimatedPopulation = parts.Length > 17 && parts[17] != "" ? int.Parse(parts[17]) : null;
+                    // record.TotalWages = parts.Length > 18 && parts[18] != "" ? int.Parse(parts[18]) : null;
+                    // record.Notes = parts.Length > 19 ? parts[19] : null;
 
                     records.Add(record);
                 }
@@ -150,7 +157,8 @@ namespace Homework4
             var result = new List<string>();
             using (var reader = new StreamReader(_statesPath))
             {
-                while (reader.ReadLine() is { } line)
+                string line;
+                while ((line = reader.ReadLine()) != null)
                 {
                     if (line == "") continue;
                     line = line.ToUpper().Replace(" ", "");
@@ -170,7 +178,6 @@ namespace Homework4
                 return;
             }
 
-            var cities = new List<string>();
             var r = GetRecords();
 
             // create a populate a dictionary for each state and all its cities
@@ -254,7 +261,8 @@ namespace Homework4
             var result = new List<string>();
             using (var reader = new StreamReader(_zipsPath))
             {
-                while (reader.ReadLine() is { } line)
+                string line;
+                while ((line = reader.ReadLine()) != null)
                 {
                     // make sure zipcode is valid
                     if (line != "" && line.All(char.IsDigit))
@@ -311,7 +319,8 @@ namespace Homework4
             var result = new List<string>();
             using (var reader = new StreamReader(_citiesPath))
             {
-                while (reader.ReadLine() is { } line)
+                string line;
+                while ((line = reader.ReadLine()) != null)
                 {
                     // Make sure line is valid
                     if (line != "")

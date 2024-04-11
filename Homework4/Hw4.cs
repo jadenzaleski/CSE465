@@ -14,6 +14,8 @@
 // => Used Pointers from lines 40 to 63 <=
 
 
+using global::System;
+
 namespace Homework4
 {
 
@@ -29,7 +31,7 @@ namespace Homework4
             // Do not add or change anything above, inside the
             // Main method
             // ============================
-            const string root = "../../../";
+            const string root = "";
             const string zipcodePath = root + "zipcodes.txt";
 
             /*
