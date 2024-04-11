@@ -126,17 +126,71 @@ public class Part1 : DataReader
 
     public void GenerateOutput()
     {
+        if (states.Count < 2)
+        {
+            Console.WriteLine("[+] Part1: There are less then two states. Cannot compare.");
+            return;
+        }
         List<string> cities = new List<string>();
         var r = GetRecords();
-        // get all the cities that match the requirement
+
+        // create a populate a dictionary for each state and all its cities
+        var stateAndCities = new Dictionary<string, List<string>>();
         foreach (var state in states)
         {
+            var cityNames = new List<string>();
 
-
+            foreach (var record in r)
+            {
+                if (record.State == state)
+                {
+                    cityNames.Add(record.City);
+                }
+            }
+            cityNames = cityNames.Distinct().ToList();
+            stateAndCities.Add(state, cityNames);
         }
 
-        Console.WriteLine("[+] Part1: Generating output to " + GetOutputFile() + " for part 1.");
+        // now we need to find all common cities.
+        // to do this we can just compare the first state with all the others.
 
+        var state1Cities = stateAndCities.ElementAt(0).Value;
+        for (int index = 1; index < stateAndCities.Count; index++) {
+            var item = stateAndCities.ElementAt(index);
+            var itemKey = item.Key;
+            var itemValue = item.Value;
+
+            // Create a new list to store common cities
+            List<string> commonCities = new List<string>();
+
+            foreach (var c in state1Cities)
+            {
+                if (itemValue.Contains(c))
+                {
+                    string s;
+                    commonCities.Add(c);
+                }
+            }
+
+            // Update state1Cities with the common cities
+            state1Cities = commonCities.ToList();
+        }
+
+        // sort
+        state1Cities.Sort();
+        state1Cities = state1Cities.Distinct().ToList();
+        // Clear the file
+        File.WriteAllText(GetOutputFile(), string.Empty);
+        // write the final list to the output file
+        using (StreamWriter writer = new StreamWriter(GetOutputFile()))
+        {
+            foreach (var city in state1Cities)
+            {
+                writer.WriteLine(city);
+            }
+        }
+
+        Console.WriteLine("[+] Part1: Common cities written to: " + GetOutputFile());
 
     }
 }
