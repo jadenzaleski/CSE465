@@ -101,7 +101,7 @@ namespace Homework4
         private Part1(string zipcodePath, string outputFile, string statesPath) : base(zipcodePath, outputFile)
         {
             _statesPath = statesPath;
-            _states = GenerateStatesList(statesPath);
+            _states = GenerateStatesList();
 
         }
 
@@ -111,15 +111,18 @@ namespace Homework4
             return new Part1(zipcodePath, outputFile, statesPath);
         }
 
-        private List<string> GenerateStatesList(string statesPath)
+        private List<string> GenerateStatesList()
         {
             var result = new List<string>();
-            using (StreamReader reader = new StreamReader(statesPath))
+            using (StreamReader reader = new StreamReader(_statesPath))
             {
                 while (reader.ReadLine() is { } line)
                 {
-                    line = line.ToUpper().Replace(" ", "");
-                    result.Add(line);
+                    if (line != "")
+                    {
+                        line = line.ToUpper().Replace(" ", "");
+                        result.Add(line);
+                    }
                 }
             }
 
@@ -200,7 +203,7 @@ namespace Homework4
         private Part2(string zipcodePath, string outputFile, string zipsPath) : base(zipcodePath, outputFile)
         {
             _zipsPath = zipsPath;
-            _zips = GenerateZipsList(zipsPath);
+            _zips = GenerateZipsList();
             // AI helped with this statement
             // gets the unique records and the first occurrence of each
             _uniqueRecords = GetRecords()
@@ -215,16 +218,16 @@ namespace Homework4
         }
 
         // generate the list of zipcodes that we can access
-        private List<string> GenerateZipsList(string zipsPath)
+        private List<string> GenerateZipsList()
         {
             var result = new List<string>();
-            using (var reader = new StreamReader(zipsPath))
+            using (var reader = new StreamReader(_zipsPath))
             {
                 while (reader.ReadLine() is { } line)
                 {
                     // make sure zipcode is valid
                     if (line != "" && line.All(char.IsDigit))
-                        result.Add(line);
+                        result.Add(line.Replace(" ", ""));
                 }
             }
 
@@ -265,10 +268,29 @@ namespace Homework4
     public class Part3 : DataReader
     {
         private readonly string _citiesPath;
+        private readonly List<string> _cities;
 
         private Part3(string zipcodePath, string outputFile, string citiesPath) : base(zipcodePath, outputFile)
         {
             _citiesPath = citiesPath;
+            _cities = GetCities();
+        }
+
+        private List<string> GetCities()
+        {
+            var result = new List<string>();
+            using (var reader = new StreamReader(_citiesPath))
+            {
+                while (reader.ReadLine() is { } line)
+                {
+                    // make sure line is valid
+                    if (line != "")
+                        result.Add(line.ToUpper());
+                }
+            }
+
+            Console.WriteLine("[+] Part3: Imported " + result.Count + " cities.");
+            return result;
         }
 
         public static Part3 CreateInstance(string zipcodePath, string outputFile, string statesPath)
@@ -279,8 +301,39 @@ namespace Homework4
 
         public void GenerateOutput()
         {
+            // Delegate to check if a city exists in a state
+            Func<string, string, bool> cityExistsInState = (city, state) =>
+                GetRecords().Any(record => record.City == city && record.State == state);
 
+            // Matrix array to store the presence of each city in each state
+            bool[,] cityStateMatrix = new bool[_cities.Count, GetRecords().Select(record => record.State).Distinct().Count()];
+
+            // Fill the matrix
+            for (int cityIndex = 0; cityIndex < _cities.Count; cityIndex++)
+            {
+                for (int stateIndex = 0; stateIndex < cityStateMatrix.GetLength(1); stateIndex++)
+                {
+                    string city = _cities[cityIndex];
+                    string state = GetRecords().Select(record => record.State).Distinct().ToList()[stateIndex];
+                    cityStateMatrix[cityIndex, stateIndex] = cityExistsInState(city, state);
+                }
+            }
+
+            // Output the city-state matrix
+            for (int cityIndex = 0; cityIndex < _cities.Count; cityIndex++)
+            {
+                string city = _cities[cityIndex];
+                Console.Write(city + ": ");
+                for (int stateIndex = 0; stateIndex < cityStateMatrix.GetLength(1); stateIndex++)
+                {
+                    string state = GetRecords().Select(record => record.State).Distinct().ToList()[stateIndex];
+                    bool exists = cityStateMatrix[cityIndex, stateIndex];
+                    Console.Write((exists ? $"{state}, " : ""));
+                }
+                Console.WriteLine();
+            }
         }
+
 
     }
 

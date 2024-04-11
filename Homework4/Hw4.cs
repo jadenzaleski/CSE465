@@ -68,6 +68,7 @@ namespace Homework4
             const string cityStatesOutputFile = root + "CityStates.txt";
             const string citiesPath = root + "cities.txt";
             var part3 = Part3.CreateInstance(zipcodePath, cityStatesOutputFile, citiesPath);
+            part3.GenerateOutput();
 
             // ============================
             // Do not add or change anything below, inside the
