@@ -14,71 +14,74 @@
 // => Used Pointers from lines 40 to 63 <=
 
 
-namespace Homework4;
-
-
-public class Hw4
+namespace Homework4
 {
-    public static void Main(string[] args)
+
+
+    public class Hw4
     {
-        // Capture the start time
-        // Must be the first line of this method
-        DateTime startTime = DateTime.Now; // Do not change
-        // ============================
-        // Do not add or change anything above, inside the
-        // Main method
-        // ============================
-        const string root = "../../../";
-        const string zipcodePath = root + "zipcodes.txt";
+        public static void Main(string[] args)
+        {
+            // Capture the start time
+            // Must be the first line of this method
+            DateTime startTime = DateTime.Now; // Do not change
+            // ============================
+            // Do not add or change anything above, inside the
+            // Main method
+            // ============================
+            const string root = "../../../";
+            const string zipcodePath = root + "zipcodes.txt";
 
-        /*
-        Part 1:
-        CommonCityNames.txt: contains all the common city names that appear in all of the states listed in states.txt.
-            i. Each city in the file must be unique, no duplicate names allowed.
-            ii. The cities should appear in sorted order.
-            iii. The cities should appear one per line.
-        */
-        const string commonCitiesOutputFile = root + "CommonCityNames.txt";
-        const string statesPath = root + "states.txt";
-        var part1 = Part1.CreateInstance(zipcodePath, commonCitiesOutputFile, statesPath);
-        part1.GenerateOutput();
-
-
-        /*
-        Part 2:
-        LatLon.txt: for each zip code listed in zips.txt, there will be a corresponding line of
-        output. Each output line will list the zip code’s latitude and longitude.
-            i. The latitude and longitude must be separated by a space on each line.
-            ii. If a zip code has multiple entries, provide the first one listed in zipcodes.txt.
-        */
-        const string latLonOutputFile = root + "LatLon.txt";
-        const string zipsPath = root + "zips.txt";
-        var part2 = Part2.CreateInstance(zipcodePath, latLonOutputFile, zipsPath);
-        part2.GenerateOutput();
-
-        /*
-        Part 3:
-        CityStates.txt: For each city listed in cities.txt, there will be a corresponding line of
-        output. Each output line will list the states containing that city name.
-            i. The states must be separated by a space.
-            ii. The states should appear in sorted order.
-            iii. Each state should be listed only once for each city.
-        */
-        const string cityStatesOutputFile = root + "CityStates.txt";
+            /*
+            Part 1:
+            CommonCityNames.txt: contains all the common city names that appear in all the states listed in states.txt.
+                i. Each city in the file must be unique, no duplicate names allowed.
+                ii. The cities should appear in sorted order.
+                iii. The cities should appear one per line.
+            */
+            const string commonCitiesOutputFile = root + "CommonCityNames.txt";
+            const string statesPath = root + "states.txt";
+            var part1 = Part1.CreateInstance(zipcodePath, commonCitiesOutputFile, statesPath);
+            part1.GenerateOutput();
 
 
-        // ============================
-        // Do not add or change anything below, inside the
-        // Main method
-        // ============================
+            /*
+            Part 2:
+            LatLon.txt: for each zip code listed in zips.txt, there will be a corresponding line of
+            output. Each output line will list the zip code’s latitude and longitude.
+                i. The latitude and longitude must be separated by a space on each line.
+                ii. If a zip code has multiple entries, provide the first one listed in zipcodes.txt.
+            */
+            const string latLonOutputFile = root + "LatLon.txt";
+            const string zipsPath = root + "zips.txt";
+            var part2 = Part2.CreateInstance(zipcodePath, latLonOutputFile, zipsPath);
+            part2.GenerateOutput();
 
-        // Capture the end time
-        DateTime endTime = DateTime.Now; // Do not change
+            /*
+            Part 3:
+            CityStates.txt: For each city listed in cities.txt, there will be a corresponding line of
+            output. Each output line will list the states containing that city name.
+                i. The states must be separated by a space.
+                ii. The states should appear in sorted order.
+                iii. Each state should be listed only once for each city.
+            */
+            const string cityStatesOutputFile = root + "CityStates.txt";
+            const string citiesPath = root + "cities.txt";
+            var part3 = Part3.CreateInstance(zipcodePath, cityStatesOutputFile, citiesPath);
 
-        // Calculate the elapsed time
-        TimeSpan elapsedTime = endTime - startTime; // Do not change
+            // ============================
+            // Do not add or change anything below, inside the
+            // Main method
+            // ============================
 
-        // Display the elapsed time in milliseconds
-        Console.WriteLine($"Elapsed Time: {elapsedTime.TotalMilliseconds} ms");
+            // Capture the end time
+            DateTime endTime = DateTime.Now; // Do not change
+
+            // Calculate the elapsed time
+            TimeSpan elapsedTime = endTime - startTime; // Do not change
+
+            // Display the elapsed time in milliseconds
+            Console.WriteLine($"Elapsed Time: {elapsedTime.TotalMilliseconds} ms");
+        }
     }
 }
