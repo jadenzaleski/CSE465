@@ -1,6 +1,5 @@
 namespace Homework4
 {
-
     public class ZipCodeRecord
     {
         public int RecordNumber { get; set; }
@@ -102,7 +101,6 @@ namespace Homework4
         {
             _statesPath = statesPath;
             _states = GenerateStatesList();
-
         }
 
         // Factory method
@@ -190,7 +188,6 @@ namespace Homework4
             }
 
             Console.WriteLine("[+] Part1: Common cities written to: " + GetOutputFile());
-
         }
     }
 
@@ -262,7 +259,6 @@ namespace Homework4
 
             Console.WriteLine("[+] Part2: Lat and Lon written to: " + GetOutputFile());
         }
-
     }
 
     public class Part3 : DataReader
@@ -283,7 +279,7 @@ namespace Homework4
             {
                 while (reader.ReadLine() is { } line)
                 {
-                    // make sure line is valid
+                    // Make sure line is valid
                     if (line != "")
                         result.Add(line.ToUpper());
                 }
@@ -301,40 +297,54 @@ namespace Homework4
 
         public void GenerateOutput()
         {
-            // Delegate to check if a city exists in a state
+            // AI helped with the delegate function and placement of items for matrix array
+            // delegate to check if a city exists in a state
             Func<string, string, bool> cityExistsInState = (city, state) =>
                 GetRecords().Any(record => record.City == city && record.State == state);
 
+            // Extract distinct and sorted states
+            List<string> distinctSortedStates = GetRecords()
+                .Select(record => record.State)
+                .Distinct()
+                .OrderBy(state => state)
+                .ToList();
+
             // Matrix array to store the presence of each city in each state
-            bool[,] cityStateMatrix = new bool[_cities.Count, GetRecords().Select(record => record.State).Distinct().Count()];
+            bool[,] cityStateMatrix = new bool[_cities.Count, distinctSortedStates.Count];
 
             // Fill the matrix
-            for (int cityIndex = 0; cityIndex < _cities.Count; cityIndex++)
+            for (var cityIndex = 0; cityIndex < _cities.Count; cityIndex++)
             {
-                for (int stateIndex = 0; stateIndex < cityStateMatrix.GetLength(1); stateIndex++)
+                // Iterate through each city in _cities list
+                for (var stateIndex = 0; stateIndex < distinctSortedStates.Count; stateIndex++)
                 {
-                    string city = _cities[cityIndex];
-                    string state = GetRecords().Select(record => record.State).Distinct().ToList()[stateIndex];
+                    // Get the city and state corresponding to the current indices
+                    var city = _cities[cityIndex];
+                    var state = distinctSortedStates[stateIndex];
+                    // Check if the city exists in the current state
                     cityStateMatrix[cityIndex, stateIndex] = cityExistsInState(city, state);
                 }
             }
 
+            // Clear the file
+            File.WriteAllText(GetOutputFile(), string.Empty);
             // Output the city-state matrix
-            for (int cityIndex = 0; cityIndex < _cities.Count; cityIndex++)
+            using (StreamWriter writer = new StreamWriter(GetOutputFile()))
             {
-                string city = _cities[cityIndex];
-                Console.Write(city + ": ");
-                for (int stateIndex = 0; stateIndex < cityStateMatrix.GetLength(1); stateIndex++)
+                for (var cityIndex = 0; cityIndex < _cities.Count; cityIndex++)
                 {
-                    string state = GetRecords().Select(record => record.State).Distinct().ToList()[stateIndex];
-                    bool exists = cityStateMatrix[cityIndex, stateIndex];
-                    Console.Write((exists ? $"{state}, " : ""));
+                    var city = _cities[cityIndex];
+                    var line = "";
+                    for (var stateIndex = 0; stateIndex < distinctSortedStates.Count; stateIndex++)
+                    {
+                        var state = distinctSortedStates[stateIndex];
+                        var exists = cityStateMatrix[cityIndex, stateIndex];
+                        line += exists ? $"{state} " : "";
+                    }
+
+                    writer.WriteLine(line);
                 }
-                Console.WriteLine();
             }
         }
-
-
     }
-
 }
