@@ -24,6 +24,8 @@ namespace Homework4
         public int? EstimatedPopulation { get; set; }
         public int? TotalWages { get; set; }
         public string? Notes { get; set; }
+
+        // AI helped with these overrides
         public static bool operator ==(ZipCodeRecord a, ZipCodeRecord b)
         {
             // If both are null, or both are same instance, return true
@@ -41,6 +43,19 @@ namespace Homework4
         public static bool operator !=(ZipCodeRecord a, ZipCodeRecord b)
         {
             return !(a == b);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is not ZipCodeRecord record)
+                return false;
+
+            return this == record;
+        }
+
+        public override int GetHashCode()
+        {
+            return Zipcode.GetHashCode();
         }
 
     }
