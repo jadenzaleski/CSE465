@@ -103,7 +103,7 @@ public class Part1 : DataReader
     }
 
     // Factory method
-    public new static Part1 CreateInstance(string zipcodePath, string outputFile, string statesPath)
+    public static Part1 CreateInstance(string zipcodePath, string outputFile, string statesPath)
     {
         return new Part1(zipcodePath, outputFile, statesPath);
     }
@@ -131,7 +131,7 @@ public class Part1 : DataReader
             Console.WriteLine("[+] Part1: There are less then two states. Cannot compare.");
             return;
         }
-        List<string> cities = new List<string>();
+        var cities = new List<string>();
         var r = GetRecords();
 
         // create a populate a dictionary for each state and all its cities
@@ -157,20 +157,10 @@ public class Part1 : DataReader
         var state1Cities = stateAndCities.ElementAt(0).Value;
         for (int index = 1; index < stateAndCities.Count; index++) {
             var item = stateAndCities.ElementAt(index);
-            var itemKey = item.Key;
             var itemValue = item.Value;
 
             // Create a new list to store common cities
-            List<string> commonCities = new List<string>();
-
-            foreach (var c in state1Cities)
-            {
-                if (itemValue.Contains(c))
-                {
-                    string s;
-                    commonCities.Add(c);
-                }
-            }
+            var commonCities = state1Cities.Where(c => itemValue.Contains(c)).ToList();
 
             // Update state1Cities with the common cities
             state1Cities = commonCities.ToList();
@@ -182,7 +172,7 @@ public class Part1 : DataReader
         // Clear the file
         File.WriteAllText(GetOutputFile(), string.Empty);
         // write the final list to the output file
-        using (StreamWriter writer = new StreamWriter(GetOutputFile()))
+        using (var writer = new StreamWriter(GetOutputFile()))
         {
             foreach (var city in state1Cities)
             {
@@ -204,17 +194,20 @@ public class Part2 : DataReader
     {
         _zipsPath = zipsPath;
         _zips = GenerateZipsList(zipsPath);
+        // AI helped with this statement
+        // gets the unique records and the first occurrence of each
         _uniqueRecords = GetRecords()
             .GroupBy(record => record.Zipcode)
             .Select(group => group.First())
             .ToList();
     }
 
-    public new static Part2 CreateInstance(string zipcodePath, string outputFile, string statesPath)
+    public static Part2 CreateInstance(string zipcodePath, string outputFile, string statesPath)
     {
         return new Part2(zipcodePath, outputFile, statesPath);
     }
 
+    // generate the list of zipcodes that we can access
     private List<string> GenerateZipsList(string zipsPath)
     {
         var result = new List<string>();
@@ -222,8 +215,9 @@ public class Part2 : DataReader
         {
             while (reader.ReadLine() is { } line)
             {
-                line = line.ToUpper().Replace(" ", "");
-                result.Add(line);
+                // make sure zipcode is valid
+                if (line != "" && line.All(char.IsDigit))
+                    result.Add(line);
             }
         }
 
@@ -237,6 +231,7 @@ public class Part2 : DataReader
         // Output unique zip code records
         foreach (var zip in _zips)
         {
+            // find each match and add the Lat and Lon to the list the we will write to the file
             foreach (var r in _uniqueRecords.Where(r => r.Zipcode == zip))
             {
                 resultStrings.Add(r.Lat + " " + r.Lon);
