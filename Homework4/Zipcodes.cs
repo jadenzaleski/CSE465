@@ -388,6 +388,8 @@ namespace Homework4
                     writer.WriteLine(line);
                 }
             }
+
+            Console.WriteLine("[+] Part3: States written to: " + GetOutputFile());
         }
     }
 }

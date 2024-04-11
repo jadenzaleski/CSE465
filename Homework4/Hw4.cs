@@ -31,6 +31,7 @@ namespace Homework4
             // Do not add or change anything above, inside the
             // Main method
             // ============================
+            // can change the root if compiling with something other than mono.
             const string root = "";
             const string zipcodePath = root + "zipcodes.txt";
 
