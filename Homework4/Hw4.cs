@@ -52,7 +52,9 @@ public class Hw4
             ii. If a zip code has multiple entries, provide the first one listed in zipcodes.txt.
         */
         const string latLonOutputFile = root + "LatLon.txt";
-
+        const string zipsPath = root + "zips.txt";
+        var part2 = Part2.CreateInstance(zipcodePath, latLonOutputFile, zipsPath);
+        part2.GenerateOutput();
 
         /*
         Part 3:

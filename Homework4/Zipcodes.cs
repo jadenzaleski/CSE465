@@ -9,7 +9,7 @@ public class ZipCodeRecord
     public string State { get; set; }
     public string LocationType { get; set; }
     public double? Lat { get; set; }
-    public double? Long { get; set; }
+    public double? Lon { get; set; }
     public double XAxis { get; set; }
     public double Yaxis { get; set; }
     public double ZAxis { get; set; }
@@ -56,7 +56,7 @@ public class DataReader
                 if (parts[6] != "")
                     record.Lat = double.Parse(parts[6].Replace("−", "-"));
                 if (parts[7] != "")
-                    record.Long = double.Parse(parts[7].Replace("−", "-"));
+                    record.Lon = double.Parse(parts[7].Replace("−", "-"));
                 record.XAxis = double.Parse(parts[8].Replace("−", "-"));
                 record.Yaxis = double.Parse(parts[9].Replace("−", "-"));
                 record.ZAxis = double.Parse(parts[10].Replace("−", "-"));
@@ -93,12 +93,12 @@ public class Part1 : DataReader
 {
     private readonly string _statesPath;
 
-    private List<string> states;
+    private readonly List<string> _states;
     // Constructor
     private Part1(string zipcodePath, string outputFile, string statesPath) : base(zipcodePath, outputFile)
     {
         _statesPath = statesPath;
-        states = GenerateStatesList(statesPath);
+        _states = GenerateStatesList(statesPath);
 
     }
 
@@ -110,7 +110,7 @@ public class Part1 : DataReader
 
     private List<string> GenerateStatesList(string statesPath)
     {
-        List<string> result = new List<string>();
+        var result = new List<string>();
         using (StreamReader reader = new StreamReader(statesPath))
         {
             while (reader.ReadLine() is { } line)
@@ -126,7 +126,7 @@ public class Part1 : DataReader
 
     public void GenerateOutput()
     {
-        if (states.Count < 2)
+        if (_states.Count < 2)
         {
             Console.WriteLine("[+] Part1: There are less then two states. Cannot compare.");
             return;
@@ -136,7 +136,7 @@ public class Part1 : DataReader
 
         // create a populate a dictionary for each state and all its cities
         var stateAndCities = new Dictionary<string, List<string>>();
-        foreach (var state in states)
+        foreach (var state in _states)
         {
             var cityNames = new List<string>();
 
@@ -193,4 +193,69 @@ public class Part1 : DataReader
         Console.WriteLine("[+] Part1: Common cities written to: " + GetOutputFile());
 
     }
+}
+
+public class Part2 : DataReader
+{
+    private readonly string _zipsPath;
+    private readonly List<string> _zips;
+    private readonly List<ZipCodeRecord> _uniqueRecords;
+    private Part2(string zipcodePath, string outputFile, string zipsPath) : base(zipcodePath, outputFile)
+    {
+        _zipsPath = zipsPath;
+        _zips = GenerateZipsList(zipsPath);
+        _uniqueRecords = GetRecords()
+            .GroupBy(record => record.Zipcode)
+            .Select(group => group.First())
+            .ToList();
+    }
+
+    public new static Part2 CreateInstance(string zipcodePath, string outputFile, string statesPath)
+    {
+        return new Part2(zipcodePath, outputFile, statesPath);
+    }
+
+    private List<string> GenerateZipsList(string zipsPath)
+    {
+        var result = new List<string>();
+        using (var reader = new StreamReader(zipsPath))
+        {
+            while (reader.ReadLine() is { } line)
+            {
+                line = line.ToUpper().Replace(" ", "");
+                result.Add(line);
+            }
+        }
+
+        Console.WriteLine("[+] Part2: Imported " + result.Count + " zipcodes.");
+        return result;
+    }
+
+    public void GenerateOutput()
+    {
+        var resultStrings = new List<string>();
+        // Output unique zip code records
+        foreach (var zip in _zips)
+        {
+            foreach (var r in _uniqueRecords.Where(r => r.Zipcode == zip))
+            {
+                resultStrings.Add(r.Lat + " " + r.Lon);
+                break;
+            }
+        }
+
+        // Clear the file
+        File.WriteAllText(GetOutputFile(), string.Empty);
+        // write the final list to the output file
+        using (StreamWriter writer = new StreamWriter(GetOutputFile()))
+        {
+            foreach (var x in resultStrings)
+            {
+                writer.WriteLine(x);
+            }
+        }
+
+        Console.WriteLine("[+] Part2: Lat and Lon written to: " + GetOutputFile());
+    }
+
 }
