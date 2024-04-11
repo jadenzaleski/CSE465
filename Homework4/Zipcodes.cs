@@ -1,5 +1,7 @@
 namespace Homework4
 {
+
+    // Object for each record in the file
     public class ZipCodeRecord
     {
         public int RecordNumber { get; set; }
@@ -22,11 +24,30 @@ namespace Homework4
         public int? EstimatedPopulation { get; set; }
         public int? TotalWages { get; set; }
         public string? Notes { get; set; }
+        public static bool operator ==(ZipCodeRecord a, ZipCodeRecord b)
+        {
+            // If both are null, or both are same instance, return true
+            if (ReferenceEquals(a, b))
+                return true;
+
+            // If one is null, but not both, return false
+            if (a is null || b is null)
+                return false;
+
+            // Return true if the zip codes are equal, false otherwise
+            return a.Zipcode == b.Zipcode;
+        }
+
+        public static bool operator !=(ZipCodeRecord a, ZipCodeRecord b)
+        {
+            return !(a == b);
+        }
+
     }
 
     public class DataReader
     {
-        private List<ZipCodeRecord> _records;
+        private readonly List<ZipCodeRecord> _records;
         private readonly string _outputFile;
 
         protected DataReader(string zipcodePath, string outputFile)
@@ -45,8 +66,8 @@ namespace Homework4
                 reader.ReadLine();
                 while (reader.ReadLine() is { } line)
                 {
-                    string[] parts = line.Split('\t');
-                    ZipCodeRecord record = new ZipCodeRecord();
+                    var parts = line.Split('\t');
+                    var record = new ZipCodeRecord();
                     record.RecordNumber = int.Parse(parts[0].Replace("−", "-"));
                     record.Zipcode = parts[1];
                     record.ZipCodeType = parts[2];
@@ -112,15 +133,13 @@ namespace Homework4
         private List<string> GenerateStatesList()
         {
             var result = new List<string>();
-            using (StreamReader reader = new StreamReader(_statesPath))
+            using (var reader = new StreamReader(_statesPath))
             {
                 while (reader.ReadLine() is { } line)
                 {
-                    if (line != "")
-                    {
-                        line = line.ToUpper().Replace(" ", "");
-                        result.Add(line);
-                    }
+                    if (line == "") continue;
+                    line = line.ToUpper().Replace(" ", "");
+                    result.Add(line);
                 }
             }
 
