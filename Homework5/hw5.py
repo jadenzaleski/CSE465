@@ -30,7 +30,6 @@ if __name__ == "__main__":
             parts = line.strip().split('\t')
             records.append(Record(parts))
 
-    print(records[0])
     '''
     Inside the __main__, do not add any codes after this line.
     ----------------------------------------------------------
