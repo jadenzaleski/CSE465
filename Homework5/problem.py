@@ -21,11 +21,10 @@ class Part1(Problem):
         # Create and populate a dictionary for each state and all its cities
         state_and_cities = {}
         for state in states:
-            city_names = []
+            city_names = set()
             for record in self.records:
                 if record.state == state:
-                    city_names.append(record.city)
-            city_names = list(set(city_names))  # Removes duplicates
+                    city_names.add(record.city)
             state_and_cities[state] = city_names
         # Find all common cities
         # Compare the first state with all the others
