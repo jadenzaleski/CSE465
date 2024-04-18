@@ -89,7 +89,7 @@ class Part3(Problem):
                 if record.city == city:
                     states_containing_city.add(record.state)
             # Add the city and its states to the dictionary
-            city_states[city] = states_containing_city
+            city_states[city] = sorted(states_containing_city)
         # Write the final list to the output file
         with open(self.outfile, "w") as writer:
             for city, states in city_states.items():
