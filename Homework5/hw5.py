@@ -1,5 +1,7 @@
 import time
 
+from record import Record
+
 """
   Homework#5
 
@@ -21,6 +23,14 @@ if __name__ == "__main__":
     -----------------------------------------------------------
     '''
 
+    records = []
+
+    with open("zipcodes.txt") as fp:
+        for line in fp.readlines()[1:]:
+            parts = line.strip().split('\t')
+            records.append(Record(parts))
+
+    print(records[0])
     '''
     Inside the __main__, do not add any codes after this line.
     ----------------------------------------------------------
