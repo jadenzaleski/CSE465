@@ -16,21 +16,16 @@ iii. The cities should appear one per line.
 
 class Part1(Problem):
     def generate(self):
-
         states = [state.strip() for state in open(self.infile).read().splitlines() if state.strip()]
-
         # Create and populate a dictionary for each state and all its cities
         state_and_cities = {}
         for state in states:
             city_names = []
-
             for record in self.records:
                 if record.state == state:
                     city_names.append(record.city)
-
             city_names = list(set(city_names))  # Removes duplicates
             state_and_cities[state] = city_names
-
         # Find all common cities
         # Compare the first state with all the others
         state1_cities = state_and_cities[list(state_and_cities.keys())[0]]
@@ -38,11 +33,9 @@ class Part1(Problem):
             if state != list(state_and_cities.keys())[0]:
                 common_cities = [city for city in state1_cities if city in cities]
                 state1_cities = common_cities[:]
-
         # Sort and remove duplicates
         state1_cities = list(set(state1_cities))
         state1_cities.sort()
-
         # Write the final list to the output file
         with open(self.outfile, "w") as writer:
             for city in state1_cities:
@@ -60,12 +53,9 @@ ii. If a zip code has multiple entries, provide the first one listed in zipcodes
 class Part2(Problem):
     def generate(self):
         unique_records = set()
-
         for record in self.records:
             unique_records.add(record)
-
         result_strings = []
-
         zips = [zip_code for zip_code in open(self.infile).read().splitlines() if zip_code.isdigit() and zip_code != ""]
         # Output unique zip code records
         for zip_code in zips:
@@ -74,7 +64,6 @@ class Part2(Problem):
                 if record.zipcode == zip_code:
                     result_strings.append(str(record.lat) + ' ' + str(record.lng))
                     break
-
         # write the final list to the output file
         with open(self.outfile, 'w') as writer:
             for item in result_strings:
@@ -92,25 +81,21 @@ iii. Each state should be listed only once for each city.
 
 class Part3(Problem):
     def generate(self):
-        # Read the list of cities from the infile
-        cities = [city.strip().upper() for city in open(self.infile).read().splitlines() if city.strip()]
-
+        # Read the list of cities from the infile and convert them to uppercase
+        cities = map(str.upper, (city.strip() for city in open(self.infile).read().splitlines() if city.strip()))
         # Create a dictionary to store the states containing each city
         city_states = {}
-
         # Populate the dictionary by iterating over each city
         for city in cities:
             states_containing_city = set()
-
             # Check each record for the current city
             for record in self.records:
                 if record.city == city:
                     states_containing_city.add(record.state)
-
             # Add the city and its states to the dictionary
             city_states[city] = states_containing_city
-
         # Write the final list to the output file
         with open(self.outfile, "w") as writer:
             for city, states in city_states.items():
                 writer.write(" ".join(states) + "\n")
+
