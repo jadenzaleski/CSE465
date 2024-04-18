@@ -18,9 +18,6 @@ class Part1(Problem):
     def generate(self):
 
         states = [state.strip() for state in open(self.infile).read().splitlines() if state.strip()]
-        if len(states) < 2:
-            print("[+] Part1: There are less than two states. Cannot compare.")
-            return
 
         # Create and populate a dictionary for each state and all its cities
         state_and_cities = {}
@@ -95,4 +92,25 @@ iii. Each state should be listed only once for each city.
 
 class Part3(Problem):
     def generate(self):
-        pass
+        # Read the list of cities from the infile
+        cities = [city.strip().upper() for city in open(self.infile).read().splitlines() if city.strip()]
+
+        # Create a dictionary to store the states containing each city
+        city_states = {}
+
+        # Populate the dictionary by iterating over each city
+        for city in cities:
+            states_containing_city = set()
+
+            # Check each record for the current city
+            for record in self.records:
+                if record.city == city:
+                    states_containing_city.add(record.state)
+
+            # Add the city and its states to the dictionary
+            city_states[city] = states_containing_city
+
+        # Write the final list to the output file
+        with open(self.outfile, "w") as writer:
+            for city, states in city_states.items():
+                writer.write(" ".join(states) + "\n")

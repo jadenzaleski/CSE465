@@ -22,6 +22,7 @@ if __name__ == "__main__":
     '''
     Inisde the __main__, do not add any codes before this line.
     -----------------------------------------------------------
+    AI helped with conversion from C#
     '''
 
     records = []
