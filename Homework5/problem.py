@@ -16,6 +16,7 @@ iii. The cities should appear one per line.
 
 class Part1(Problem):
     def generate(self):
+        # List Comprehension
         states = [state.strip() for state in open(self.infile).read().splitlines() if state.strip()]
         # Create and populate a dictionary for each state and all its cities
         state_and_cities = {}
@@ -52,22 +53,18 @@ ii. If a zip code has multiple entries, provide the first one listed in zipcodes
 
 class Part2(Problem):
     def generate(self):
-        unique_records = set()
-        for record in self.records:
-            unique_records.add(record)
+        # Create a set of unique records
+        unique_records = set(self.records)
+        # Extract latitudes and longitudes for zip codes
         result_strings = []
-        zips = [zip_code for zip_code in open(self.infile).read().splitlines() if zip_code.isdigit() and zip_code != ""]
-        # Output unique zip code records
+        zips = filter(lambda z: z.isdigit() and z != "", open(self.infile).read().splitlines())
         for zip_code in zips:
-            # find each match and add the Lat and Lon to the list the we will write to the file
-            for record in unique_records:
-                if record.zipcode == zip_code:
-                    result_strings.append(str(record.lat) + ' ' + str(record.lng))
-                    break
-        # write the final list to the output file
+            matching_record = next((record for record in unique_records if record.zipcode == zip_code), None)
+            if matching_record:
+                result_strings.append(f"{matching_record.lat} {matching_record.lng}")
+        # Write the final list to the output file
         with open(self.outfile, 'w') as writer:
-            for item in result_strings:
-                writer.write(item + '\n')
+            writer.write("\n".join(result_strings))
 
 
 '''
@@ -98,4 +95,3 @@ class Part3(Problem):
         with open(self.outfile, "w") as writer:
             for city, states in city_states.items():
                 writer.write(" ".join(states) + "\n")
-
