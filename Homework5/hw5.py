@@ -1,6 +1,6 @@
 import time
 
-from problem import Part1
+from problem import Part1, Part2
 from record import Record
 
 """
@@ -49,6 +49,8 @@ if __name__ == "__main__":
     i. The latitude and longitude must be separated by a space on each line.
     ii. If a zip code has multiple entries, provide the first one listed in zipcodes.txt.
     '''
+
+    Part2(records, 'zips.txt', 'LatLon.txt').generate()
 
     '''
     Part3

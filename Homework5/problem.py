@@ -65,13 +65,32 @@ ii. If a zip code has multiple entries, provide the first one listed in zipcodes
 
 
 class Part2(Problem):
-    def read_input(self):
-        with open(self.infile, 'r') as f:
-            pass
+    def generate(self):
+        unique_records = set()
 
-    def write_output(self):
-        with open(self.outfile, 'w') as f:
-            pass
+        for record in self.records:
+            unique_records.add(record)
+
+        result_strings = []
+
+        zips = [zip_code for zip_code in open(self.infile).read().splitlines() if zip_code.isdigit() and zip_code != ""]
+        # Output unique zip code records
+        for zip_code in zips:
+            # find each match and add the Lat and Lon to the list the we will write to the file
+            for record in unique_records:
+                if record.zipcode == zip_code:
+                    result_strings.append(str(record.lat) + ' ' + str(record.lng))
+                    break
+
+        # Clear the file
+        with open(self.outfile, 'w') as file:
+            file.write('')
+
+        # write the final list to the output file
+        with open(self.outfile, 'w') as writer:
+            for item in result_strings:
+                writer.write(item + '\n')
+
 
 
 '''

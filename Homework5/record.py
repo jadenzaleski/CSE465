@@ -23,3 +23,9 @@ class Record:
             )
         else:
             return False
+
+    def same_zipcode(self, other):
+        return self.zipcode == other.zipcode
+
+    def __hash__(self):
+        return hash((self.record_number, self.zipcode, self.city, self.state, self.lat, self.lng))
