@@ -46,10 +46,6 @@ class Part1(Problem):
         state1_cities = list(set(state1_cities))
         state1_cities.sort()
 
-        # Clear the output file
-        with open(self.outfile, "w") as f:
-            f.truncate(0)
-
         # Write the final list to the output file
         with open(self.outfile, "w") as writer:
             for city in state1_cities:
@@ -82,15 +78,10 @@ class Part2(Problem):
                     result_strings.append(str(record.lat) + ' ' + str(record.lng))
                     break
 
-        # Clear the file
-        with open(self.outfile, 'w') as file:
-            file.write('')
-
         # write the final list to the output file
         with open(self.outfile, 'w') as writer:
             for item in result_strings:
                 writer.write(item + '\n')
-
 
 
 '''
@@ -103,10 +94,5 @@ iii. Each state should be listed only once for each city.
 
 
 class Part3(Problem):
-    def read_input(self):
-        with open(self.infile, 'r') as f:
-            pass
-
-    def write_output(self):
-        with open(self.outfile, 'w') as f:
-            pass
+    def generate(self):
+        pass

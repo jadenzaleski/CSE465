@@ -1,6 +1,6 @@
 import time
 
-from problem import Part1, Part2
+from problem import Part1, Part2, Part3
 from record import Record
 
 """
@@ -60,6 +60,8 @@ if __name__ == "__main__":
     ii. The states should appear in sorted order.
     iii. Each state should be listed only once for each city.
     '''
+
+    Part3(records, 'cities.txt', 'CityStates.txt').generate()
 
     '''
     Inside the __main__, do not add any codes after this line.
