@@ -10,3 +10,16 @@ class Record:
 
     def __str__(self):
         return f'{self.record_number} {self.city} {self.state} {self.lat} {self.lng}'
+
+    def __eq__(self, other):
+        if isinstance(other, Record):
+            return (
+                    self.record_number == other.record_number and
+                    self.zipcode == other.zipcode and
+                    self.city == other.city and
+                    self.state == other.state and
+                    self.lat == other.lat and
+                    self.lng == other.lng
+            )
+        else:
+            return False
