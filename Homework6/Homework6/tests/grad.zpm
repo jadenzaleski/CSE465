@@ -1,0 +1,14 @@
+str = "a" ;
+A = 10 ;
+FOR 3 str += "A" ; FOR 2 str += "-" ; str += "-" ; ENDFOR A += 1 ; A -= 1 ; ENDFOR
+PRINT str ;
+PRINT A ;
+
+num = 2 ;
+str = "->" ;
+FOR num str += "A" ; str += "a" ; FOR 2 str += "-" ; str += "-" ; ENDFOR ENDFOR
+PRINT str ;
+
+num = 0 ;
+str = "*" ;
+FOR 3 num += 1 ; FOR num str += "*" ; ENDFOR PRINT str ; ENDFOR

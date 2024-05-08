@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		D77972312BDCAB0100FC13CA /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D77972302BDCAB0100FC13CA /* main.cpp */; };
+		D77972312BDCAB0100FC13CA /* Zpm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D77972302BDCAB0100FC13CA /* Zpm.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -24,7 +24,16 @@
 
 /* Begin PBXFileReference section */
 		D779722D2BDCAB0100FC13CA /* Homework6 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Homework6; sourceTree = BUILT_PRODUCTS_DIR; };
-		D77972302BDCAB0100FC13CA /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		D77972302BDCAB0100FC13CA /* Zpm.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Zpm.cpp; sourceTree = "<group>"; };
+		D7802EE12BEBC14100AD60BF /* test6.zpm */ = {isa = PBXFileReference; lastKnownFileType = text; path = test6.zpm; sourceTree = "<group>"; };
+		D7802EE22BEBC14100AD60BF /* grad.zpm */ = {isa = PBXFileReference; lastKnownFileType = text; path = grad.zpm; sourceTree = "<group>"; };
+		D7802EE32BEBC14100AD60BF /* test3.zpm */ = {isa = PBXFileReference; lastKnownFileType = text; path = test3.zpm; sourceTree = "<group>"; };
+		D7802EE42BEBC14100AD60BF /* test4.zpm */ = {isa = PBXFileReference; lastKnownFileType = text; path = test4.zpm; sourceTree = "<group>"; };
+		D7802EE52BEBC14200AD60BF /* test1.zpm */ = {isa = PBXFileReference; lastKnownFileType = text; path = test1.zpm; sourceTree = "<group>"; };
+		D7802EE62BEBC14200AD60BF /* test2.zpm */ = {isa = PBXFileReference; lastKnownFileType = text; path = test2.zpm; sourceTree = "<group>"; };
+		D7802EE72BEBC14200AD60BF /* actual_program.zpm */ = {isa = PBXFileReference; lastKnownFileType = text; path = actual_program.zpm; sourceTree = "<group>"; };
+		D7802EE82BEBC14200AD60BF /* results.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = results.txt; sourceTree = "<group>"; };
+		D7802EE92BEBC14300AD60BF /* test5.zpm */ = {isa = PBXFileReference; lastKnownFileType = text; path = test5.zpm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,9 +66,26 @@
 		D779722F2BDCAB0100FC13CA /* Homework6 */ = {
 			isa = PBXGroup;
 			children = (
-				D77972302BDCAB0100FC13CA /* main.cpp */,
+				D7802EE02BEBC12E00AD60BF /* tests */,
+				D77972302BDCAB0100FC13CA /* Zpm.cpp */,
 			);
 			path = Homework6;
+			sourceTree = "<group>";
+		};
+		D7802EE02BEBC12E00AD60BF /* tests */ = {
+			isa = PBXGroup;
+			children = (
+				D7802EE72BEBC14200AD60BF /* actual_program.zpm */,
+				D7802EE22BEBC14100AD60BF /* grad.zpm */,
+				D7802EE82BEBC14200AD60BF /* results.txt */,
+				D7802EE52BEBC14200AD60BF /* test1.zpm */,
+				D7802EE62BEBC14200AD60BF /* test2.zpm */,
+				D7802EE32BEBC14100AD60BF /* test3.zpm */,
+				D7802EE42BEBC14100AD60BF /* test4.zpm */,
+				D7802EE92BEBC14300AD60BF /* test5.zpm */,
+				D7802EE12BEBC14100AD60BF /* test6.zpm */,
+			);
+			path = tests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -119,7 +145,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D77972312BDCAB0100FC13CA /* main.cpp in Sources */,
+				D77972312BDCAB0100FC13CA /* Zpm.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
