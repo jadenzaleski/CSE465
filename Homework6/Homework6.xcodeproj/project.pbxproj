@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		D77972312BDCAB0100FC13CA /* Zpm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D77972302BDCAB0100FC13CA /* Zpm.cpp */; };
+		D7802EEC2BEBC60200AD60BF /* Interpreter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D7802EEA2BEBC60200AD60BF /* Interpreter.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -34,6 +35,7 @@
 		D7802EE72BEBC14200AD60BF /* actual_program.zpm */ = {isa = PBXFileReference; lastKnownFileType = text; path = actual_program.zpm; sourceTree = "<group>"; };
 		D7802EE82BEBC14200AD60BF /* results.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = results.txt; sourceTree = "<group>"; };
 		D7802EE92BEBC14300AD60BF /* test5.zpm */ = {isa = PBXFileReference; lastKnownFileType = text; path = test5.zpm; sourceTree = "<group>"; };
+		D7802EEA2BEBC60200AD60BF /* Interpreter.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Interpreter.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,6 +68,7 @@
 		D779722F2BDCAB0100FC13CA /* Homework6 */ = {
 			isa = PBXGroup;
 			children = (
+				D7802EEA2BEBC60200AD60BF /* Interpreter.cpp */,
 				D7802EE02BEBC12E00AD60BF /* tests */,
 				D77972302BDCAB0100FC13CA /* Zpm.cpp */,
 			);
@@ -145,6 +148,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D7802EEC2BEBC60200AD60BF /* Interpreter.cpp in Sources */,
 				D77972312BDCAB0100FC13CA /* Zpm.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

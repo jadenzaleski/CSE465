@@ -9,7 +9,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-
+#include "Interpreter.cpp"
 
 int main(int argc, const char *argv[]) {
     // AI helped with argument and file handling
@@ -28,9 +28,17 @@ int main(int argc, const char *argv[]) {
         std::cout << "Using: " << filePath << std::endl;
     }
     
-    std::string line;
-    while (std::getline(file, line)) { // Read the file line by line
-        std::cout << line << "\n";    // Output the line to the console
+    // Create an instance of the Interpreter class
+    Interpreter interpreter(filePath);
+    
+    // Run the interpreter to process the file
+    try {
+        interpreter.run();
+        // Print the variables after processing
+        interpreter.print_variables();
+    } catch (std::runtime_error& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        return 1; // Return with an error status
     }
     
     file.close(); // Close the file when done
