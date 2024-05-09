@@ -1,3 +1,5 @@
 A = 0 ;
 num = 3 ;
 FOR num A += 1 ; PRINT A ; ENDFOR
+str = "END" ;
+PRINT str ;
