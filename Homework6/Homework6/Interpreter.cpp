@@ -51,7 +51,11 @@ public:
                     std::cerr << "Error: Invalid loop count." << std::endl;
                     break;
                 }
-                std::vector<std::vector<Token>> loopBody(structuredTokens.begin() + i + 1, structuredTokens.begin() + i + loopCount);
+                // loop body start after the For # and ends at EndFor.
+                size_t startLoop = i + 1; // The loop body starts after "FOR" and the loop count
+                size_t endLoop = findEndFor(structuredTokens, startLoop);
+                
+                std::vector<std::vector<Token>> loopBody(structuredTokens.begin() + startLoop, structuredTokens.begin() + endLoop);
                 executeLoop(loopBody, loopCount); // Run the loop
                 i += loopBody.size(); // Skip over the loop content
             } 
@@ -67,6 +71,15 @@ private:
     size_t currentIndex;
     std::unordered_map<std::string, VariableValue> variables;
     std::vector<std::vector<Token>> structuredTokens;
+    
+    size_t findEndFor(const std::vector<std::vector<Token>>& structuredTokens, size_t start) {
+        for (size_t i = start; i < structuredTokens.size(); i++) {
+            if (structuredTokens[i][0].type == TokenType::EndFor) {
+                return i; // Return the index of "ENDFOR"
+            }
+        }
+        return structuredTokens.size(); // If "ENDFOR" is not found, return the end of the vector
+    }
     
     // Function to handle assignments
     void handleAssignment(const std::vector<Token>& line) {
