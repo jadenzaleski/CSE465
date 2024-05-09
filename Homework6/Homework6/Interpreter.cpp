@@ -76,40 +76,107 @@ private:
         
         if (operatorToken.type == TokenType::Assign) {
             if (valueToken.type == TokenType::Number && isNumeric(valueToken.value)) {
+                // Assign a number to a variable
                 int newValue = std::stoi(valueToken.value);
                 variables[varName] = newValue;
-            } else if (valueToken.type == TokenType::Identifier && variables.find(valueToken.value) != variables.end()) {
-                const VariableValue& sourceValue = variables.at(valueToken.value);
-                variables[varName] = sourceValue;
+            } else if (valueToken.type == TokenType::String) {
+                // Assign a string to a variable
+                variables[varName] = valueToken.value;
+            } else if (valueToken.type == TokenType::Identifier) {
+                // Check if the identifier refers to an existing variable
+                if (variables.find(valueToken.value) != variables.end()) {
+                    const VariableValue& sourceValue = variables.at(valueToken.value);
+                    variables[varName] = sourceValue; // Assign the source variable's value
+                } else {
+                    std::cerr << "Error: Variable '" << valueToken.value << "' not found." << std::endl;
+                }
             } else {
-                std::cerr << "Error: Invalid assignment." << std::endl;
+                std::cerr << "Error: Invalid assignment value." << std::endl;
             }
         } else if (operatorToken.type == TokenType::PlusAssign) {
-            if (variables.find(varName) != variables.end() && std::holds_alternative<int>(variables[varName])) {
-                int existingValue = std::get<int>(variables[varName]);
-                
-                if (isNumeric(valueToken.value)) {
-                    int additionValue = std::stoi(valueToken.value);
-                    variables[varName] = existingValue + additionValue;
-                } else if (variables.find(valueToken.value) != variables.end() && std::holds_alternative<int>(variables[valueToken.value])) {
-                    int additionValue = std::get<int>(variables[valueToken.value]);
-                    variables[varName] = existingValue + additionValue;
-                } else {
-                    std::cerr << "Error: Invalid addition value." << std::endl;
+            if (variables.find(varName) != variables.end()) {
+                if (std::holds_alternative<int>(variables[varName])) {
+                    int existingValue = std::get<int>(variables[varName]);
+                    
+                    if (isNumeric(valueToken.value)) {
+                        int additionValue = std::stoi(valueToken.value);
+                        variables[varName] = existingValue + additionValue;
+                    } else if (variables.find(valueToken.value) != variables.end() && std::holds_alternative<int>(variables[valueToken.value])) {
+                        int additionValue = std::get<int>(variables[valueToken.value]);
+                        variables[varName] = existingValue + additionValue;
+                    } else {
+                        std::cerr << "Invalid addition value: " << valueToken.value << std::endl;
+                    }
+                } else if (std::holds_alternative<std::string>(variables[varName])) {
+                    // String concatenation
+                    std::string existingValue = std::get<std::string>(variables[varName]);
+                    
+                    if (valueToken.type == TokenType::Identifier) {
+                        if (variables.find(valueToken.value) != variables.end() && std::holds_alternative<std::string>(variables[valueToken.value])) {
+                            // If the addition value is a valid existing string variable
+                            std::string additionValue = std::get<std::string>(variables[valueToken.value]);
+                            variables[varName] = existingValue + additionValue;
+                        } else {
+                            // If the variable is not found or it's not a string
+                            std::cerr << "Error: Cannot concatenate non-string or non-existent variable '" << valueToken.value << "' to string '" << varName << "'." << std::endl;
+                        }
+                    } else if (valueToken.type == TokenType::String) {
+                        // Concatenation with a string literal
+                        std::string newValue = valueToken.value;
+                        variables[varName] = existingValue + newValue;
+                    } else {
+                        // If the addition value is not a valid string
+                        std::cerr << "Error: Invalid addition value for string concatenation." << std::endl;
+                    }
                 }
+            } else {
+                std::cerr << "Variable not found: " << varName << std::endl;
             }
         } else if (operatorToken.type == TokenType::MinusAssign) {
-            if (variables.find(varName) != variables.end() && std::holds_alternative<int>(variables[varName])) {
+            // Check if the variable is an integer
+            if (std::holds_alternative<int>(variables[varName])) {
                 int existingValue = std::get<int>(variables[varName]);
-                if (isNumeric(valueToken.value)) {
+                
+                if (valueToken.type == TokenType::Number && isNumeric(valueToken.value)) {
+                    // Subtract a numeric literal
                     int subtractionValue = std::stoi(valueToken.value);
                     variables[varName] = existingValue - subtractionValue;
-                } else if (variables.find(valueToken.value) != variables.end() && std::holds_alternative<int>(variables[valueToken.value])) {
-                    int subtractionValue = std::get<int>(variables[valueToken.value]);
-                    variables[varName] = existingValue - subtractionValue;
+                } else if (valueToken.type == TokenType::Identifier) {
+                    if (variables.find(valueToken.value) != variables.end() && std::holds_alternative<int>(variables[valueToken.value])) {
+                        // Subtraction with another integer variable
+                        int subtractionValue = std::get<int>(variables[valueToken.value]);
+                        variables[varName] = existingValue - subtractionValue;
+                    } else {
+                        std::cerr << "Error: Invalid variable for subtraction." << std::endl;
+                    }
                 } else {
-                    std::cerr << "Error: Invalid variable for subtraction." << std::endl;
+                    std::cerr << "Error: Invalid value for subtraction." << std::endl;
                 }
+            } else {
+                std::cerr << "Error: Variable '" << varName << "' is not an integer." << std::endl;
+            }
+        } else if (operatorToken.type == TokenType::MultAssign) {
+            // Check if the variable is an integer
+            if (std::holds_alternative<int>(variables[varName])) {
+                int existingValue = std::get<int>(variables[varName]);
+                
+                if (valueToken.type == TokenType::Number && isNumeric(valueToken.value)) {
+                    // Subtract a numeric literal
+                    int multiplicationValue = std::stoi(valueToken.value);
+                    variables[varName] = existingValue * multiplicationValue;
+                } else if (valueToken.type == TokenType::Identifier) {
+                    if (variables.find(valueToken.value) != variables.end() && std::holds_alternative<int>(variables[valueToken.value])) {
+                        // Subtraction with another integer variable
+                        int multiplicationValue = std::get<int>(variables[valueToken.value]);
+                        variables[varName] = existingValue * multiplicationValue;
+                    } else {
+                        std::cerr << "Error: Invalid variable for multiplication." << std::endl;
+                    }
+                } else {
+                    std::cerr << "Error: Invalid value for multiplication." << std::endl;
+                }
+            } else {
+                std::cerr << "Error: Variable '" << varName << "' is not an integer." << std::endl;
             }
         }
     }
@@ -121,9 +188,9 @@ private:
             if (variables.find(variableName) != variables.end()) {
                 const auto& variableValue = variables.at(variableName);
                 if (std::holds_alternative<int>(variableValue)) {
-                    std::cout << variableName << " = " << std::get<int>(variableValue) << std::endl;
+                    std::cout << variableName << "=" << std::get<int>(variableValue) << std::endl;
                 } else if (std::holds_alternative<std::string>(variableValue)) {
-                    std::cout << variableName << " = " << std::get<std::string>(variableValue) << std::endl;
+                    std::cout << variableName << "=\"" << std::get<std::string>(variableValue) << "\"" << std::endl;
                 }
             } else {
                 std::cerr << "Variable not found: " << variableName << std::endl;
@@ -214,16 +281,6 @@ private:
         }
         
         return unrolledTokens;
-    }
-    
-    // Function to print the variable's value
-    void printVariable(const std::string& variableName) {
-        const auto& variableValue = variables.at(variableName);
-        if (std::holds_alternative<int>(variableValue)) {
-            std::cout << variableName << "=" << std::get<int>(variableValue) << std::endl;
-        } else if (std::holds_alternative<std::string>(variableValue)) {
-            std::cout << variableName << "=\"" << std::get<std::string>(variableValue) << "\"" << std::endl;
-        }
     }
     
     // Function to check if a string is numeric
