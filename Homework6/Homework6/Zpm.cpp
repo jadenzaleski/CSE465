@@ -9,7 +9,22 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include "Interpreter.cpp"
+#include "Lexer.cpp"
+
+std::string readFile(const std::string& filename) {
+    std::ifstream file(filename);
+    
+    if (!file.is_open()) {
+        std::cerr << "Error opening file: " << filename << std::endl;
+        return "";
+    }
+    
+    std::string content((std::istreambuf_iterator<char>(file)),
+                        std::istreambuf_iterator<char>());
+    
+    file.close();
+    return content;
+}
 
 int main(int argc, const char *argv[]) {
     // AI helped with argument and file handling
@@ -28,18 +43,13 @@ int main(int argc, const char *argv[]) {
         std::cout << "Using: " << filePath << std::endl;
     }
     
-    // Create an instance of the Interpreter class
-    Interpreter interpreter(filePath);
+    std::string sourceCode = readFile(filePath);
     
-    // Run the interpreter to process the file
-    try {
-        interpreter.run();
-        // Print the variables after processing
-        interpreter.print_variables();
-    } catch (std::runtime_error& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
-        return 1; // Return with an error status
-    }
+    Lexer lexer(sourceCode);
+    auto tokens = lexer.tokenize();
+    
+    lexer.printTokens(tokens);
+    
     
     file.close(); // Close the file when done
     return 0;     // Successful execution
