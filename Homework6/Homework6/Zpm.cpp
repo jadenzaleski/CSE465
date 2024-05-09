@@ -10,6 +10,7 @@
 #include <fstream>
 #include <string>
 #include "Lexer.cpp"
+#include "Interpreter.cpp"
 
 std::string readFile(const std::string& filename) {
     std::ifstream file(filename);
@@ -50,6 +51,8 @@ int main(int argc, const char *argv[]) {
     
     lexer.printTokens(tokens);
     
+    Interpreter interpreter(tokens);
+    interpreter.run();
     
     file.close(); // Close the file when done
     return 0;     // Successful execution

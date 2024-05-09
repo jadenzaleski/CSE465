@@ -2,4 +2,8 @@ num = 10 ;
 num += 1 ;
 num -= 1 ;
 num *= 2 ;
+
+A = 0 ;
+FOR 6 A += 1 ; ENDFOR
+
 PRINT num ;

@@ -21,6 +21,8 @@ enum class TokenType {
     MultAssign,
     Semicolon,
     Print,
+    For,
+    EndFor,
     EndOfFile
 };
 
@@ -76,6 +78,12 @@ public:
                 case TokenType::Identifier:
                     std::cout << "Identifier";
                     break;
+                case TokenType::For:
+                    std::cout << "For";
+                    break;
+                case TokenType::EndFor:
+                    std::cout << "EndFor";
+                    break;
                 case TokenType::Number:
                     std::cout << "Number";
                     break;
@@ -124,10 +132,17 @@ private:
             oss << source[index++];
         }
     
-        if (oss.str() == "PRINT") {
-            return { TokenType::Print, oss.str() };
+        std::string identifier = oss.str();
+        
+        if (identifier == "PRINT") {
+            return { TokenType::Print, identifier };
+        } else if (identifier == "FOR") {
+            return { TokenType::For, "FOR" };
+        } else if (identifier == "ENDFOR") {
+            return { TokenType::EndFor, "ENDFOR" };
         }
-        return { TokenType::Identifier, oss.str() };
+        
+        return { TokenType::Identifier, identifier };
 
     }
     
