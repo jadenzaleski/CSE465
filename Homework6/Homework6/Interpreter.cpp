@@ -45,32 +45,35 @@ private:
         std::vector<std::pair<std::string, std::string>> tokens;
         
         const std::vector<std::pair<std::string, std::string>> TOKEN_SPECIFICATION = {
-            {"INT_VAR",     R"([a-zA-Z_][a-zA-Z_0-9]*\s)"},
-            {"STR_VAR",     R"([a-zA-Z_][a-zA-Z_0-9]*\s)"},
-            {"ASSIGN",      R"((?<=\s)=(?=\s))"},
-            {"PLUS_ASSIGN", R"((?<=\s)\+=(?=\s))"},
-            {"MINUS_ASSIGN",R"((?<=\s)-=(?=\s))"},
-            {"MULT_ASSIGN", R"((?<=\s)\*=(?=\s))"},
-            {"INT_VAR_VAL", R"((?<=\+=|-=|\*=)\s[a-zA-Z_][a-zA-Z_0-9]*)"},
-            {"STR_VAR_VAL", R"((?<=\+=)\s[a-zA-Z_][a-zA-Z_0-9]*)"},
-            {"NUMBER",      R"((?<=\s)-?\d+(?=\s))"},
+            {"PRINT",       R"(PRINT\s[a-zA-Z_][a-zA-Z_0-9]+)"},
+            {"STR_VAR",     R"([a-zA-Z_][a-zA-Z_0-9]+\s)"},
+            {"INT_VAR",     R"([a-zA-Z_][a-zA-Z_0-9]+\s)"},
+            {"ASSIGN",      R"((\?<=\s)\=(\?=\s))"},
+            {"PLUS_ASSIGN", R"((\?<=\s)\+=(\?=\s))"},
+            {"MINUS_ASSIGN",R"((\?<=\s)-=(\?=\s))"},
+            {"MULT_ASSIGN", R"((\?<=\s)\*=(\?=\s))"},
+            {"INT_VAR_VAL", R"((\?<=\+=|-=|\*=)\s[a-zA-Z_][a-zA-Z_0-9]*)"},
+            {"STR_VAR_VAL", R"((\?<=\+=)\s[a-zA-Z_][a-zA-Z_0-9]*)"},
+            {"NUMBER",      R"((\?<=\s)-?\d+(\?=\s))"},
             {"STRING",      R"("[^"]*")"},
-            {"SEMICOLON",   R"((?<=\s);)"},
+            {"SEMICOLON",   R"((\?<=\s);)"},
             {"WS",          R"(\s+)"},
-            {"NEWLN",       R"(\n)"}
+            {"NEWLN",       R"(\n)"},
         };
         
+        // Loop through the token specification and apply each regex pattern
         for (const auto& spec : TOKEN_SPECIFICATION) {
             std::regex regex(spec.second);
             std::smatch match;
             std::string::const_iterator search_start(line.cbegin());
             
+            // Use a while loop to find all matches in the line
             while (std::regex_search(search_start, line.cend(), match, regex)) {
-                std::string token_value = match.str();
-                if (spec.first != "WS" && spec.first != "NEWLN") {
-                    tokens.emplace_back(spec.first, token_value);
+                if (spec.first != "WS" && spec.first != "NEWLN") { // Skip unwanted tokens
+                    tokens.emplace_back(spec.first, match.str()); // Store token type and value
                 }
-                search_start += match.position() + match.length(); // move forward in the string
+                // Move the search start to after the current match
+                search_start += match.position() + match.length();
             }
         }
         
@@ -79,10 +82,16 @@ private:
     
     void parse(const std::vector<std::pair<std::string, std::string>>& tokens) {
         auto it = tokens.cbegin();
-        
         while (it != tokens.cend()) {
             auto token = *it;
-            if (token.first == "INT_VAR" || token.first == "STR_VAR") {
+            
+            if (token.first == "PRINT") {
+                std::string var_name = token.second.substr(6);  // Extract variable name after "PRINT "
+                if (variables.find(var_name) == variables.end()) {
+                    throw std::runtime_error("Undefined variable: " + var_name + " at line " + std::to_string(line_number));
+                }
+                std::cout << var_name << ": " << variables[var_name] << std::endl;
+            } else if (token.first == "INT_VAR" || token.first == "STR_VAR") {
                 std::string var_name = token.second;
                 
                 ++it; // Skip INT_VAR or STR_VAR
@@ -98,6 +107,8 @@ private:
                 std::string semicolon = it->second;  // Ensure semicolon
                 
                 if (semicolon != ";") {
+                    std::cout << semicolon << std::endl;
+                    
                     throw std::runtime_error("Missing semicolon at line " + std::to_string(line_number));
                 }
                 
