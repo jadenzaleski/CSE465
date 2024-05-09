@@ -17,18 +17,48 @@ using VariableValue = std::variant<int, std::string>;
 
 class Interpreter {
 public:
-    Interpreter(const std::vector<Token>& tokens) : tokens(tokens), currentIndex(0) {}
+    Interpreter(const std::vector<Token>& tokens) : tokens(tokens), structuredTokens(structureTokens(unrollForLoops(tokens))), currentIndex(0) {}
     
     void run() {
-        std::vector<Token> unrolledTokens = unrollForLoops(tokens);
-        structureTokens(unrolledTokens);
+        for (const auto& line : structuredTokens) {
+            for (currentIndex = 0; currentIndex < line.size(); currentIndex++) {
+                const auto& token = line[currentIndex];
+                
+                switch (token.type) {
+                    case TokenType::Assign:
+                        std::cout << "Assign";
+                        break;
+                    case TokenType::MultAssign:
+                        std::cout << "MultAssign";
+                        break;
+                    case TokenType::PlusAssign:
+                        std::cout << "PlusAssign";
+                        break;
+                    case TokenType::MinusAssign:
+                        std::cout << "MinusAssign";
+                        break;
+                    case TokenType::Semicolon:
+                        std::cout << "Semicolon";
+                        break;
+                    case TokenType::EndOfFile:
+                        std::cout << "EndOfFile";
+                        break;
+                    case TokenType::Print:
+                        std::cout << "Print";
+                        break;
+                    default:
+                        std::cout << "Unknown";
+                }
+            }
+            
+        }
     }
     
 private:
     const std::vector<Token>& tokens;
     size_t currentIndex;
     std::unordered_map<std::string, VariableValue> variables;
-    
+    std::vector<std::vector<Token>> structuredTokens;
     
     std::vector<std::vector<Token>> structureTokens(const std::vector<Token>& tokens) {
         std::vector<std::vector<Token>> linedTokens; // 2D vector
@@ -86,31 +116,5 @@ private:
         }
         
         return unrolledTokens;
-    }
-    
-    void parseAssignment() {
-        std::string varName = tokens[currentIndex].value;
-        currentIndex++; // Move past the identifier
-        
-        if (tokens[currentIndex].value == "=") {
-            currentIndex++; // Move past '='
-            int value = parseExpression(); // This could be more complex for full expressions
-            variables[varName] = value;
-            std::cout << varName << " = " << value << std::endl;
-        }
-    }
-    
-    int parseExpression() {
-        // In a simple case, parse a single number. A more complex implementation
-        // would handle arithmetic and precedence.
-        const auto& token = tokens[currentIndex];
-        if (token.type == TokenType::Number) {
-            int value = std::stoi(token.value);
-            currentIndex++;
-            return value;
-        }
-        
-        std::cerr << "Expected a number, got: " << token.value << std::endl;
-        return 0;
     }
 };
