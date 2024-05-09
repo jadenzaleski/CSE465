@@ -9,7 +9,6 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include "Lexer.cpp"
 #include "Interpreter.cpp"
 
 std::string readFile(const std::string& filename) {
