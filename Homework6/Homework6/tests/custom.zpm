@@ -5,7 +5,8 @@ num += num2 ;
 
 str = "hi" ;
 str += " jaden" ;
-
+str2 = " zaleski" ;
+str += str2 ;
 
 PRINT num ;
 

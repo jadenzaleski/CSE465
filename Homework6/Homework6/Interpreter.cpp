@@ -52,7 +52,7 @@ public:
                             if (isNumeric(valueToken.value)) {
                                 int additionValue = std::stoi(valueToken.value);
                                 variables[varName] = existingValue + additionValue;
-                            } else if (variables.find(valueToken.value) != variables.end()) {
+                            } else if (variables.find(valueToken.value) != variables.end() && std::holds_alternative<int>(variables[valueToken.value])) {
                                 int additionValue = std::get<int>(variables[valueToken.value]);
                                 variables[varName] = existingValue + additionValue;
                             } else {
@@ -61,8 +61,24 @@ public:
                         } else if (std::holds_alternative<std::string>(variables[varName])) {
                             // String concatenation
                             std::string existingValue = std::get<std::string>(variables[varName]);
-                            std::string newValue = valueToken.value;
-                            variables[varName] = existingValue + newValue;
+                            
+                            if (valueToken.type == TokenType::Identifier) {
+                                if (variables.find(valueToken.value) != variables.end() && std::holds_alternative<std::string>(variables[valueToken.value])) {
+                                    // If the addition value is a valid existing string variable
+                                    std::string additionValue = std::get<std::string>(variables[valueToken.value]);
+                                    variables[varName] = existingValue + additionValue;
+                                } else {
+                                    // If the variable is not found or it's not a string
+                                    std::cerr << "Error: Cannot concatenate non-string or non-existent variable '" << valueToken.value << "' to string '" << varName << "'." << std::endl;
+                                }
+                            } else if (valueToken.type == TokenType::String) {
+                                // Concatenation with a string literal
+                                std::string newValue = valueToken.value;
+                                variables[varName] = existingValue + newValue;
+                            } else {
+                                // If the addition value is not a valid string
+                                std::cerr << "Error: Invalid addition value for string concatenation." << std::endl;
+                            }
                         }
                     } else {
                         std::cerr << "Variable not found: " << varName << std::endl;
@@ -142,7 +158,7 @@ private:
         if (std::holds_alternative<int>(variableValue)) {
             std::cout << variableName << "=" << std::get<int>(variableValue) << std::endl;
         } else if (std::holds_alternative<std::string>(variableValue)) {
-            std::cout << variableName << "=" << std::get<std::string>(variableValue) << std::endl;
+            std::cout << variableName << "=\"" << std::get<std::string>(variableValue) << "\"" << std::endl;
         }
     }
     
