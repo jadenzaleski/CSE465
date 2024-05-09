@@ -1,13 +1,3 @@
-num = 10 ;
-num += 1 ;
-num2 = 5 ;
-num += num2 ;
-num *= "10" ;
-str = "hi" ;
-str += " jaden" ;
-str2 = " zaleski" ;
-str += str2 ;
-
-PRINT num ;
-
-PRINT str ;
+A = 0 ;
+num = 3 ;
+FOR num A += 1 ; PRINT A ; ENDFOR

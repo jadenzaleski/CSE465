@@ -17,7 +17,7 @@ using VariableValue = std::variant<int, std::string>;
 
 class Interpreter {
 public:
-    Interpreter(const std::vector<Token>& tokens) : tokens(tokens), structuredTokens(structureTokens(unrollForLoops(tokens))), currentIndex(0) {}
+    Interpreter(const std::vector<Token>& tokens) : tokens(tokens), structuredTokens(structureTokens(tokens)), currentIndex(0) {}
     
     void run() {
         for (const auto& line : structuredTokens) {
@@ -158,10 +158,17 @@ private:
         std::vector<std::vector<Token>> linedTokens; // 2D vector
         std::vector<Token> currentLine; // Temporary vector to hold current line of tokens
         
-        for (const auto& token : tokens) {
-            if (token.type == TokenType::Semicolon) {
+        for (size_t i = 0; i < tokens.size(); i++) {
+            const auto& token = tokens[i];
+            if (token.type == TokenType::Semicolon || token.type == TokenType::EndFor) {
                 // Add the current line to the list of lines
-                currentLine.push_back(token); // Add the semicolon to the end of the line
+                currentLine.push_back(token); // Add the token to the end of the line
+                linedTokens.push_back(currentLine); // Store the current line
+                currentLine.clear(); // Clear the current line for next usage
+            } else if (token.type == TokenType::For) {
+                // Add the current line to the list of lines
+                currentLine.push_back(token); // Add the token to the end of the line
+                currentLine.push_back(tokens[i + 1]); // the number of for
                 linedTokens.push_back(currentLine); // Store the current line
                 currentLine.clear(); // Clear the current line for next usage
             } else {
@@ -186,7 +193,7 @@ private:
         
         for (size_t i = 0; i < tokens.size(); i++) {
             const auto& token = tokens[i];
-            
+
             if (token.type == TokenType::For) {
                 if (i + 1 < tokens.size() && tokens[i + 1].type == TokenType::Number) {
                     loopCount = std::stoi(tokens[i + 1].value); // Get the loop count
@@ -207,6 +214,8 @@ private:
                 // If not in a loop, add tokens normally
                 unrolledTokens.push_back(token);
             }
+            
+            
         }
         
         return unrolledTokens;
