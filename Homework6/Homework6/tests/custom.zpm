@@ -2,7 +2,7 @@ num = 10 ;
 num += 1 ;
 num2 = 5 ;
 num += num2 ;
-
+num *= "10" ;
 str = "hi" ;
 str += " jaden" ;
 str2 = " zaleski" ;

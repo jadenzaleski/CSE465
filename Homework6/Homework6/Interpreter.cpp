@@ -30,19 +30,32 @@ public:
                     std::cerr << "Variable not found: " << variableName << std::endl;
                 }
             } else if (line.size() == 4 && (line[1].type == TokenType::Assign ||
-                                            line[1].type == TokenType::PlusAssign)) {
+                                            line[1].type == TokenType::PlusAssign ||
+                                            line[1].type == TokenType::MinusAssign ||
+                                            line[1].type == TokenType::MultAssign)) {
                 // Handle assignment and compound assignment
                 const std::string varName = line[0].value;
                 const auto& operatorToken = line[1];
                 const auto& valueToken = line[2];
                 
                 if (operatorToken.type == TokenType::Assign) {
-                    // Basic assignment
                     if (valueToken.type == TokenType::Number && isNumeric(valueToken.value)) {
+                        // Assign a number to a variable
                         int newValue = std::stoi(valueToken.value);
                         variables[varName] = newValue;
                     } else if (valueToken.type == TokenType::String) {
+                        // Assign a string to a variable
                         variables[varName] = valueToken.value;
+                    } else if (valueToken.type == TokenType::Identifier) {
+                        // Check if the identifier refers to an existing variable
+                        if (variables.find(valueToken.value) != variables.end()) {
+                            const VariableValue& sourceValue = variables.at(valueToken.value);
+                            variables[varName] = sourceValue; // Assign the source variable's value
+                        } else {
+                            std::cerr << "Error: Variable '" << valueToken.value << "' not found." << std::endl;
+                        }
+                    } else {
+                        std::cerr << "Error: Invalid assignment value." << std::endl;
                     }
                 } else if (operatorToken.type == TokenType::PlusAssign) {
                     if (variables.find(varName) != variables.end()) {
@@ -83,7 +96,54 @@ public:
                     } else {
                         std::cerr << "Variable not found: " << varName << std::endl;
                     }
+                } else if (operatorToken.type == TokenType::MinusAssign) {
+                    // Check if the variable is an integer
+                    if (std::holds_alternative<int>(variables[varName])) {
+                        int existingValue = std::get<int>(variables[varName]);
+                        
+                        if (valueToken.type == TokenType::Number && isNumeric(valueToken.value)) {
+                            // Subtract a numeric literal
+                            int subtractionValue = std::stoi(valueToken.value);
+                            variables[varName] = existingValue - subtractionValue;
+                        } else if (valueToken.type == TokenType::Identifier) {
+                            if (variables.find(valueToken.value) != variables.end() && std::holds_alternative<int>(variables[valueToken.value])) {
+                                // Subtraction with another integer variable
+                                int subtractionValue = std::get<int>(variables[valueToken.value]);
+                                variables[varName] = existingValue - subtractionValue;
+                            } else {
+                                std::cerr << "Error: Invalid variable for subtraction." << std::endl;
+                            }
+                        } else {
+                            std::cerr << "Error: Invalid value for subtraction." << std::endl;
+                        }
+                    } else {
+                        std::cerr << "Error: Variable '" << varName << "' is not an integer." << std::endl;
+                    }
+                } else if (operatorToken.type == TokenType::MultAssign) {
+                    // Check if the variable is an integer
+                    if (std::holds_alternative<int>(variables[varName])) {
+                        int existingValue = std::get<int>(variables[varName]);
+                        
+                        if (valueToken.type == TokenType::Number && isNumeric(valueToken.value)) {
+                            // Subtract a numeric literal
+                            int multiplicationValue = std::stoi(valueToken.value);
+                            variables[varName] = existingValue * multiplicationValue;
+                        } else if (valueToken.type == TokenType::Identifier) {
+                            if (variables.find(valueToken.value) != variables.end() && std::holds_alternative<int>(variables[valueToken.value])) {
+                                // Subtraction with another integer variable
+                                int multiplicationValue = std::get<int>(variables[valueToken.value]);
+                                variables[varName] = existingValue * multiplicationValue;
+                            } else {
+                                std::cerr << "Error: Invalid variable for multiplication." << std::endl;
+                            }
+                        } else {
+                            std::cerr << "Error: Invalid value for multiplication." << std::endl;
+                        }
+                    } else {
+                        std::cerr << "Error: Variable '" << varName << "' is not an integer." << std::endl;
+                    }
                 }
+
             }
         }
     }
