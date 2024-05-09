@@ -21,36 +21,54 @@ public:
     
     void run() {
         for (const auto& line : structuredTokens) {
-            for (currentIndex = 0; currentIndex < line.size(); currentIndex++) {
-                const auto& token = line[currentIndex];
+            if (line.size() == 3 && line[0].type == TokenType::Print) {
+                // Handle PRINT statements
+                const auto& variableName = line[1].value;
+                if (variables.find(variableName) != variables.end()) {
+                    printVariable(variableName);
+                } else {
+                    std::cerr << "Variable not found: " << variableName << std::endl;
+                }
+            } else if (line.size() == 4 && (line[1].type == TokenType::Assign ||
+                                            line[1].type == TokenType::PlusAssign)) {
+                // Handle assignment and compound assignment
+                const std::string varName = line[0].value;
+                const auto& operatorToken = line[1];
+                const auto& valueToken = line[2];
                 
-                switch (token.type) {
-                    case TokenType::Assign:
-                        std::cout << "Assign";
-                        break;
-                    case TokenType::MultAssign:
-                        std::cout << "MultAssign";
-                        break;
-                    case TokenType::PlusAssign:
-                        std::cout << "PlusAssign";
-                        break;
-                    case TokenType::MinusAssign:
-                        std::cout << "MinusAssign";
-                        break;
-                    case TokenType::Semicolon:
-                        std::cout << "Semicolon";
-                        break;
-                    case TokenType::EndOfFile:
-                        std::cout << "EndOfFile";
-                        break;
-                    case TokenType::Print:
-                        std::cout << "Print";
-                        break;
-                    default:
-                        std::cout << "Unknown";
+                if (operatorToken.type == TokenType::Assign) {
+                    // Basic assignment
+                    if (valueToken.type == TokenType::Number && isNumeric(valueToken.value)) {
+                        int newValue = std::stoi(valueToken.value);
+                        variables[varName] = newValue;
+                    } else if (valueToken.type == TokenType::String) {
+                        variables[varName] = valueToken.value;
+                    }
+                } else if (operatorToken.type == TokenType::PlusAssign) {
+                    if (variables.find(varName) != variables.end()) {
+                        if (std::holds_alternative<int>(variables[varName])) {
+                            int existingValue = std::get<int>(variables[varName]);
+                            
+                            if (isNumeric(valueToken.value)) {
+                                int additionValue = std::stoi(valueToken.value);
+                                variables[varName] = existingValue + additionValue;
+                            } else if (variables.find(valueToken.value) != variables.end()) {
+                                int additionValue = std::get<int>(variables[valueToken.value]);
+                                variables[varName] = existingValue + additionValue;
+                            } else {
+                                std::cerr << "Invalid addition value: " << valueToken.value << std::endl;
+                            }
+                        } else if (std::holds_alternative<std::string>(variables[varName])) {
+                            // String concatenation
+                            std::string existingValue = std::get<std::string>(variables[varName]);
+                            std::string newValue = valueToken.value;
+                            variables[varName] = existingValue + newValue;
+                        }
+                    } else {
+                        std::cerr << "Variable not found: " << varName << std::endl;
+                    }
                 }
             }
-            
         }
     }
     
@@ -116,5 +134,33 @@ private:
         }
         
         return unrolledTokens;
+    }
+    
+    // Function to print the variable's value
+    void printVariable(const std::string& variableName) {
+        const auto& variableValue = variables.at(variableName);
+        if (std::holds_alternative<int>(variableValue)) {
+            std::cout << variableName << "=" << std::get<int>(variableValue) << std::endl;
+        } else if (std::holds_alternative<std::string>(variableValue)) {
+            std::cout << variableName << "=" << std::get<std::string>(variableValue) << std::endl;
+        }
+    }
+    
+    // Function to check if a string is numeric
+    bool isNumeric(const std::string& str) {
+        if (str.empty()) return false;
+        
+        size_t start = 0;
+        if (str[0] == '-' || str[0] == '+') {
+            start = 1; // Account for negative/positive signs
+        }
+        
+        for (size_t i = start; i < str.size(); i++) {
+            if (!std::isdigit(str[i])) {
+                return false; // If any non-digit is found, it's not numeric
+            }
+        }
+        
+        return true;
     }
 };

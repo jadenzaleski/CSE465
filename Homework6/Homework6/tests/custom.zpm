@@ -1,9 +1,12 @@
 num = 10 ;
 num += 1 ;
-num -= 1 ;
-num *= 2 ;
+num2 = 5 ;
+num += num2 ;
 
-A = 0 ;
-FOR 2 A += 100 ; ENDFOR
+str = "hi" ;
+str += " jaden" ;
+
 
 PRINT num ;
+
+PRINT str ;
