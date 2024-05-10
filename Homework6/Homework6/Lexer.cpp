@@ -34,7 +34,7 @@ struct Token {
 class Lexer {
 public:
     Lexer(const std::string& source) : source(source), index(0) {}
-    
+    // turn the source code into tokens
     std::vector<Token> tokenize() {
         std::vector<Token> tokens;
         while (index < source.length()) {

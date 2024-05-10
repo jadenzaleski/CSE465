@@ -23,17 +23,19 @@ public:
     void run() {
         size_t loopCount = 0;
         size_t i = 0;
-        
+        // loop through all the tokens
         while (i < structuredTokens.size()) {
             const auto& line = structuredTokens[i];
-            
+            // if its a print
             if (line.size() == 3 && line[0].type == TokenType::Print) {
                 handlePrint(line);
+                // if its any kind of assign
             } else if (line.size() == 4 && (line[1].type == TokenType::Assign ||
                                             line[1].type == TokenType::PlusAssign ||
                                             line[1].type == TokenType::MinusAssign ||
                                             line[1].type == TokenType::MultAssign)) {
                 handleAssignment(line);
+                // if its a For
             } else if (line.size() == 2 && line[0].type == TokenType::For) {
                 // Capture the FOR loop's starting point and loop count
                 if (structuredTokens[i][1].type == TokenType::Number) {
@@ -41,11 +43,11 @@ public:
                     loopCount = std::stoi(structuredTokens[i][1].value);
                 } else if (structuredTokens[i][1].type == TokenType::Identifier) {
                     const std::string& varName = structuredTokens[i][1].value;
-                    
+                    // get the number of times to loop
                     if (variables.find(varName) != variables.end() && std::holds_alternative<int>(variables[varName])) {
                         loopCount = std::get<int>(variables[varName]); // Retrieve the loop count from a variable
                     } else {
-//                        std::cerr << "Error: Loop count variable '" << varName << "' not found or is not an integer." << std::endl;
+                        //                        std::cerr << "Error: Loop count variable '" << varName << "' not found or is not an integer." << std::endl;
                         error(line);
                         break;
                     }
@@ -53,16 +55,14 @@ public:
                 // loop body start after the For # and ends at EndFor.
                 size_t startLoop = i + 1; // The loop body starts after "FOR" and the loop count
                 size_t endLoop = findEndFor(structuredTokens, startLoop);
-                
+                // all the code that is being looped
                 std::vector<std::vector<Token>> loopBody(structuredTokens.begin() + startLoop, structuredTokens.begin() + endLoop);
                 executeLoop(loopBody, loopCount); // Run the loop
                 i += loopBody.size(); // Skip over the loop content
             } 
-            
             ++i; // Move to the next line
         }
     }
-    
     
     
 private:
@@ -71,10 +71,12 @@ private:
     std::unordered_map<std::string, VariableValue> variables;
     std::vector<std::vector<Token>> structuredTokens;
     std::string filePath;
-    
+    // Print the erros
+    // It is easier just to search for the line in the file then to backtrace the entire
+    // program to get the line number.
     void error(const std::vector<Token>& line) {
         std::string stringLine;
-        
+        // make the string
         for (const auto& token : line) {
             if (token.type == TokenType::String) {
                 stringLine += "\"" + token.value + "\"";
@@ -85,12 +87,10 @@ private:
         }
         
         stringLine.erase(stringLine.end() - 1);
-        
         std::ifstream file(filePath);
-        
         // String to store each line of the file.
         std::string currentLine;
-        
+        // open the file and search for the string
         int i = 0;
         if (file.is_open()) {
             while (getline(file, currentLine)) {
@@ -100,15 +100,14 @@ private:
                     exit(1);
                 }
             }
-
+            
             file.close();
         }
-        
+        // there isnt a match but there is an error
         std::cout << "RUNTIME ERROR: line unknown " << std::endl;
         exit(1);
-        
     }
-    
+    // find the EndFor
     size_t findEndFor(const std::vector<std::vector<Token>>& structuredTokens, size_t start) {
         for (size_t i = start; i < structuredTokens.size(); i++) {
             if (structuredTokens[i][0].type == TokenType::EndFor) {
@@ -123,7 +122,7 @@ private:
         const std::string varName = line[0].value;
         const auto& operatorToken = line[1];
         const auto& valueToken = line[2];
-        
+        // =
         if (operatorToken.type == TokenType::Assign) {
             if (valueToken.type == TokenType::Number && isNumeric(valueToken.value)) {
                 // Assign a number to a variable
@@ -142,9 +141,10 @@ private:
                     error(line);
                 }
             } else {
-//                std::cerr << "Error: Invalid assignment value." << std::endl;
+                //                std::cerr << "Error: Invalid assignment value." << std::endl;
                 error(line);
             }
+            // +=
         } else if (operatorToken.type == TokenType::PlusAssign) {
             if (variables.find(varName) != variables.end()) {
                 if (std::holds_alternative<int>(variables[varName])) {
@@ -157,7 +157,7 @@ private:
                         int additionValue = std::get<int>(variables[valueToken.value]);
                         variables[varName] = existingValue + additionValue;
                     } else {
-//                        std::cerr << "Invalid addition value: " << valueToken.value << std::endl;
+                        //                        std::cerr << "Invalid addition value: " << valueToken.value << std::endl;
                         error(line);
                     }
                 } else if (std::holds_alternative<std::string>(variables[varName])) {
@@ -171,7 +171,7 @@ private:
                             variables[varName] = existingValue + additionValue;
                         } else {
                             // If the variable is not found or it's not a string
-//                            std::cerr << "Error: Cannot concatenate non-string or non-existent variable '" << valueToken.value << "' to string '" << varName << "'." << std::endl;
+                            //                            std::cerr << "Error: Cannot concatenate non-string or non-existent variable '" << valueToken.value << "' to string '" << varName << "'." << std::endl;
                             error(line);
                         }
                     } else if (valueToken.type == TokenType::String) {
@@ -180,14 +180,15 @@ private:
                         variables[varName] = existingValue + newValue;
                     } else {
                         // If the addition value is not a valid string
-//                        std::cerr << "Error: Invalid addition value for string concatenation." << std::endl;
+                        //                        std::cerr << "Error: Invalid addition value for string concatenation." << std::endl;
                         error(line);
                     }
                 }
             } else {
-//                std::cerr << "Variable not found: " << varName << std::endl;
+                //                std::cerr << "Variable not found: " << varName << std::endl;
                 error(line);
             }
+            // -=
         } else if (operatorToken.type == TokenType::MinusAssign) {
             // Check if the variable is an integer
             if (std::holds_alternative<int>(variables[varName])) {
@@ -203,17 +204,18 @@ private:
                         int subtractionValue = std::get<int>(variables[valueToken.value]);
                         variables[varName] = existingValue - subtractionValue;
                     } else {
-//                        std::cerr << "Error: Invalid variable for subtraction." << std::endl;
+                        //                        std::cerr << "Error: Invalid variable for subtraction." << std::endl;
                         error(line);
                     }
                 } else {
-//                    std::cerr << "Error: Invalid value for subtraction." << std::endl;
+                    //                    std::cerr << "Error: Invalid value for subtraction." << std::endl;
                     error(line);
                 }
             } else {
-//                std::cerr << "Error: Variable '" << varName << "' is not an integer." << std::endl;
+                //                std::cerr << "Error: Variable '" << varName << "' is not an integer." << std::endl;
                 error(line);
             }
+            // *=
         } else if (operatorToken.type == TokenType::MultAssign) {
             // Check if the variable is an integer
             if (std::holds_alternative<int>(variables[varName])) {
@@ -229,15 +231,15 @@ private:
                         int multiplicationValue = std::get<int>(variables[valueToken.value]);
                         variables[varName] = existingValue * multiplicationValue;
                     } else {
-//                        std::cerr << "Error: Invalid variable for multiplication." << std::endl;
+                        //                        std::cerr << "Error: Invalid variable for multiplication." << std::endl;
                         error(line);
                     }
                 } else {
-//                    std::cerr << "Error: Invalid value for multiplication." << std::endl;
+                    //                    std::cerr << "Error: Invalid value for multiplication." << std::endl;
                     error(line);
                 }
             } else {
-//                std::cerr << "Error: Variable '" << varName << "' is not an integer." << std::endl;
+                //                std::cerr << "Error: Variable '" << varName << "' is not an integer." << std::endl;
                 error(line);
             }
         }
@@ -255,7 +257,7 @@ private:
                     std::cout << variableName << "=\"" << std::get<std::string>(variableValue) << "\"" << std::endl;
                 }
             } else {
-//                std::cerr << "Variable not found: " << variableName << std::endl;
+                //                std::cerr << "Variable not found: " << variableName << std::endl;
                 error(line);
             }
         }
@@ -277,7 +279,7 @@ private:
             }
         }
     }
-    
+    // create a list of tokens where each array of tokens is a line
     std::vector<std::vector<Token>> structureTokens(const std::vector<Token>& tokens) {
         std::vector<std::vector<Token>> linedTokens; // 2D vector
         std::vector<Token> currentLine; // Temporary vector to hold current line of tokens
@@ -308,42 +310,6 @@ private:
         }
         
         return linedTokens;
-    }
-    
-    std::vector<Token> unrollForLoops(const std::vector<Token>& tokens) {
-        std::vector<Token> unrolledTokens;
-        std::vector<Token> loopBody;
-        bool inLoop = false;
-        int loopCount = 0;
-        
-        for (size_t i = 0; i < tokens.size(); i++) {
-            const auto& token = tokens[i];
-
-            if (token.type == TokenType::For) {
-                if (i + 1 < tokens.size() && tokens[i + 1].type == TokenType::Number) {
-                    loopCount = std::stoi(tokens[i + 1].value); // Get the loop count
-                    inLoop = true; // Start collecting the loop body
-                    i++; // Skip the loop count token
-                }
-            } else if (inLoop && token.type == TokenType::EndFor) {
-                // If we've reached the end of the loop, duplicate the loop body
-                for (int j = 0; j < loopCount; j++) {
-                    unrolledTokens.insert(unrolledTokens.end(), loopBody.begin(), loopBody.end());
-                }
-                loopBody.clear();
-                inLoop = false; // Exit loop collection
-            } else if (inLoop) {
-                // If in a loop, add tokens to the loop body
-                loopBody.push_back(token);
-            } else {
-                // If not in a loop, add tokens normally
-                unrolledTokens.push_back(token);
-            }
-            
-            
-        }
-        
-        return unrolledTokens;
     }
     
     // Function to check if a string is numeric

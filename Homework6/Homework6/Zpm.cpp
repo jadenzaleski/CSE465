@@ -5,12 +5,14 @@
 //  Created by Jaden Zaleski on 4/26/24.
 //
 // => I’m competing for BONUS Points <=
+//
+// AI helped with the Lexer and Interpreter.
 
 #include <iostream>
 #include <fstream>
 #include <string>
 #include "Interpreter.cpp"
-
+// create a single string of the file.
 std::string readFile(const std::string& filename) {
     std::ifstream file(filename);
     
@@ -35,12 +37,12 @@ int main(int argc, const char *argv[]) {
     
     std::string filePath = argv[1];
     std::ifstream file(filePath); // Open the specified file for reading
-    
+    // open the file
     if (!file.is_open()) {
         std::cerr << "Error: Could not open file " << filePath << "\n";
         return 1; // Return with an error status
     } else {
-        std::cout << "Using: " << filePath << std::endl;
+//        std::cout << "Using: " << filePath << std::endl;
     }
     
     std::string sourceCode = readFile(filePath);
@@ -48,7 +50,7 @@ int main(int argc, const char *argv[]) {
     Lexer lexer(sourceCode);
     auto tokens = lexer.tokenize();
     
-    lexer.printTokens(tokens);
+//    lexer.printTokens(tokens);
     
     Interpreter interpreter(tokens, filePath);
     interpreter.run();
