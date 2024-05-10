@@ -12,12 +12,13 @@
 #include <memory>
 #include <variant>
 #include "Lexer.cpp"
+#include <fstream>
 
 using VariableValue = std::variant<int, std::string>;
 
 class Interpreter {
 public:
-    Interpreter(const std::vector<Token>& tokens) : tokens(tokens), structuredTokens(structureTokens(tokens)), currentIndex(0) {}
+    Interpreter(const std::vector<Token>& tokens, const std::string& filePath) : tokens(tokens), filePath(filePath), structuredTokens(structureTokens(tokens)), currentIndex(0) {}
     
     void run() {
         size_t loopCount = 0;
@@ -44,12 +45,10 @@ public:
                     if (variables.find(varName) != variables.end() && std::holds_alternative<int>(variables[varName])) {
                         loopCount = std::get<int>(variables[varName]); // Retrieve the loop count from a variable
                     } else {
-                        std::cerr << "Error: Loop count variable '" << varName << "' not found or is not an integer." << std::endl;
+//                        std::cerr << "Error: Loop count variable '" << varName << "' not found or is not an integer." << std::endl;
+                        error(line);
                         break;
                     }
-                } else {
-                    std::cerr << "Error: Invalid loop count." << std::endl;
-                    break;
                 }
                 // loop body start after the For # and ends at EndFor.
                 size_t startLoop = i + 1; // The loop body starts after "FOR" and the loop count
@@ -71,6 +70,44 @@ private:
     size_t currentIndex;
     std::unordered_map<std::string, VariableValue> variables;
     std::vector<std::vector<Token>> structuredTokens;
+    std::string filePath;
+    
+    void error(const std::vector<Token>& line) {
+        std::string stringLine;
+        
+        for (const auto& token : line) {
+            if (token.type == TokenType::String) {
+                stringLine += "\"" + token.value + "\"";
+            } else {
+                stringLine += token.value;
+            }
+            stringLine += " "; // Add a space between tokens for readability
+        }
+        
+        stringLine.erase(stringLine.end() - 1);
+        
+        std::ifstream file(filePath);
+        
+        // String to store each line of the file.
+        std::string currentLine;
+        
+        int i = 0;
+        if (file.is_open()) {
+            while (getline(file, currentLine)) {
+                ++i;
+                if (currentLine == stringLine) {
+                    std::cout << "RUNTIME ERROR: line " << i << std::endl;
+                    exit(1);
+                }
+            }
+
+            file.close();
+        }
+        
+        std::cout << "RUNTIME ERROR: line unknown " << std::endl;
+        exit(1);
+        
+    }
     
     size_t findEndFor(const std::vector<std::vector<Token>>& structuredTokens, size_t start) {
         for (size_t i = start; i < structuredTokens.size(); i++) {
@@ -101,10 +138,12 @@ private:
                     const VariableValue& sourceValue = variables.at(valueToken.value);
                     variables[varName] = sourceValue; // Assign the source variable's value
                 } else {
-                    std::cerr << "Error: Variable '" << valueToken.value << "' not found." << std::endl;
+                    //std::cerr << "Error: Variable '" << valueToken.value << "' not found." << std::endl;
+                    error(line);
                 }
             } else {
-                std::cerr << "Error: Invalid assignment value." << std::endl;
+//                std::cerr << "Error: Invalid assignment value." << std::endl;
+                error(line);
             }
         } else if (operatorToken.type == TokenType::PlusAssign) {
             if (variables.find(varName) != variables.end()) {
@@ -118,7 +157,8 @@ private:
                         int additionValue = std::get<int>(variables[valueToken.value]);
                         variables[varName] = existingValue + additionValue;
                     } else {
-                        std::cerr << "Invalid addition value: " << valueToken.value << std::endl;
+//                        std::cerr << "Invalid addition value: " << valueToken.value << std::endl;
+                        error(line);
                     }
                 } else if (std::holds_alternative<std::string>(variables[varName])) {
                     // String concatenation
@@ -131,7 +171,8 @@ private:
                             variables[varName] = existingValue + additionValue;
                         } else {
                             // If the variable is not found or it's not a string
-                            std::cerr << "Error: Cannot concatenate non-string or non-existent variable '" << valueToken.value << "' to string '" << varName << "'." << std::endl;
+//                            std::cerr << "Error: Cannot concatenate non-string or non-existent variable '" << valueToken.value << "' to string '" << varName << "'." << std::endl;
+                            error(line);
                         }
                     } else if (valueToken.type == TokenType::String) {
                         // Concatenation with a string literal
@@ -139,11 +180,13 @@ private:
                         variables[varName] = existingValue + newValue;
                     } else {
                         // If the addition value is not a valid string
-                        std::cerr << "Error: Invalid addition value for string concatenation." << std::endl;
+//                        std::cerr << "Error: Invalid addition value for string concatenation." << std::endl;
+                        error(line);
                     }
                 }
             } else {
-                std::cerr << "Variable not found: " << varName << std::endl;
+//                std::cerr << "Variable not found: " << varName << std::endl;
+                error(line);
             }
         } else if (operatorToken.type == TokenType::MinusAssign) {
             // Check if the variable is an integer
@@ -160,13 +203,16 @@ private:
                         int subtractionValue = std::get<int>(variables[valueToken.value]);
                         variables[varName] = existingValue - subtractionValue;
                     } else {
-                        std::cerr << "Error: Invalid variable for subtraction." << std::endl;
+//                        std::cerr << "Error: Invalid variable for subtraction." << std::endl;
+                        error(line);
                     }
                 } else {
-                    std::cerr << "Error: Invalid value for subtraction." << std::endl;
+//                    std::cerr << "Error: Invalid value for subtraction." << std::endl;
+                    error(line);
                 }
             } else {
-                std::cerr << "Error: Variable '" << varName << "' is not an integer." << std::endl;
+//                std::cerr << "Error: Variable '" << varName << "' is not an integer." << std::endl;
+                error(line);
             }
         } else if (operatorToken.type == TokenType::MultAssign) {
             // Check if the variable is an integer
@@ -183,13 +229,16 @@ private:
                         int multiplicationValue = std::get<int>(variables[valueToken.value]);
                         variables[varName] = existingValue * multiplicationValue;
                     } else {
-                        std::cerr << "Error: Invalid variable for multiplication." << std::endl;
+//                        std::cerr << "Error: Invalid variable for multiplication." << std::endl;
+                        error(line);
                     }
                 } else {
-                    std::cerr << "Error: Invalid value for multiplication." << std::endl;
+//                    std::cerr << "Error: Invalid value for multiplication." << std::endl;
+                    error(line);
                 }
             } else {
-                std::cerr << "Error: Variable '" << varName << "' is not an integer." << std::endl;
+//                std::cerr << "Error: Variable '" << varName << "' is not an integer." << std::endl;
+                error(line);
             }
         }
     }
@@ -206,7 +255,8 @@ private:
                     std::cout << variableName << "=\"" << std::get<std::string>(variableValue) << "\"" << std::endl;
                 }
             } else {
-                std::cerr << "Variable not found: " << variableName << std::endl;
+//                std::cerr << "Variable not found: " << variableName << std::endl;
+                error(line);
             }
         }
     }

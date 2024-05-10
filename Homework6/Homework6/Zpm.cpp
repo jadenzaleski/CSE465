@@ -50,7 +50,7 @@ int main(int argc, const char *argv[]) {
     
     lexer.printTokens(tokens);
     
-    Interpreter interpreter(tokens);
+    Interpreter interpreter(tokens, filePath);
     interpreter.run();
     
     file.close(); // Close the file when done
